@@ -1,0 +1,11 @@
+{
+  "MASSIVE_ATTACK_API_URL": "https://url.to.massive-attack.api",
+  "_MASSIVE_ATTACK_API_URL_COMMENT_": "url of Massive-Attack API",
+
+  "AUTHENTICATION_MODE": "keycloak",
+  "_AUTHENTICATION_MODE_COMMENT": "The mode of authentication. ['anonymous','keycloak' ]",
+
+  "PLATEFORM":"TRAINING",
+  "_PLATEFORM_COMMENT":"The API may be connected to multiple environnements. [PRODUCTION, TRAINING]"
+
+}
