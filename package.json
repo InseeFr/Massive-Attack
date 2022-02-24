@@ -1,0 +1,102 @@
+{
+  "name": "massive-attack",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "axios": "^0.21.1",
+    "date-fns": "^2.25.0",
+    "keycloak-js": "^14.0.0",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^5.2.1",
+    "react-scripts": "4.0.3",
+    "web-vitals": "^1.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "prettier",
+      "plugin:react-hooks/recommended",
+      "plugin:jsx-a11y/recommended",
+      "plugin:import/warnings"
+    ],
+    "plugins": [
+      "prettier",
+      "jsx-a11y"
+    ],
+    "rules": {
+      "react/prop-types": [
+        "off"
+      ],
+      "prettier/prettier": [
+        1,
+        {
+          "arrowParens": "avoid"
+        }
+      ]
+    },
+    "globals": {
+      "fetch": true,
+      "window": true,
+      "document": true,
+      "navigator": true
+    },
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "paths": [
+            "src"
+          ]
+        }
+      }
+    }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "endOfLine": "auto",
+    "arrowParens": "avoid"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.23",
+    "@types/react-router-dom": "^5.1.3",
+    "copy-and-watch": "^0.1.4",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "jest-sonar-reporter": "^2.0.0",
+    "prettier": "^1.19.1"
+  }
+}
