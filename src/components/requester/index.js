@@ -82,7 +82,7 @@ const Requester = () => {
   const updateInterviewer = (newValue, index) => {
     const values = interviewers
       .map(inter => {
-        return inter.index === index ? { ...inter, id: newValue.toUpperCase() } : inter;
+        return inter.index === index ? { ...inter, id: newValue.trim().toUpperCase() } : inter;
       })
       .map(inter => inter.id);
     const uniqValues = [...new Set(values)];
