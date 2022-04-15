@@ -3,7 +3,7 @@ name: Release & Docker
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
     tags:
       - '*'
 
@@ -66,8 +66,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: inseefr/queen
+          name: inseefrlab/massive-attack
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           tags: ${{steps.version.outputs.prop}}
-   
