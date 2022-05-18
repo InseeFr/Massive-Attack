@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: massive-attack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: massive-attack
+  template:
+    metadata:
+      labels:
+        app: massive-attack
+    spec:
+      containers:
+        - name: massive-attack
+          image: inseefr/massive-attack:1.0.5
+          env:
+            - name: MASSIVE_ATTACK_API_URL
+              value: https://sabiane-data-api.dev.insee.io
+            - name: AUTHENTICATION_MODE
+              value: anonymous
+            - name: PLATEFORM
+              value: CLOUD
