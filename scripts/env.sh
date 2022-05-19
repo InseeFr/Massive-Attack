@@ -19,6 +19,6 @@ do
   
 done < .env
 envsubst < "./configuration.json" > "configuration.temp"
-envsubst < "./oidc.json" > "oidc.temp"
+envsubst < "./keycloak.json" > "keycloak.temp"
 mv configuration.temp configuration.json
-mv oidc.temp oidc.json
+mv keycloak.temp keycloak.json
