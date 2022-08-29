@@ -12,7 +12,7 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { deleteCampaign, getCampaigns } from '../../utils/api/massive-attack-api';
 
 import { AppContext } from '../app/App';
@@ -30,18 +30,19 @@ const useStyles = makeStyles(() => ({
 }));
 
 const TrainingCourses = () => {
-  const { organisationalUnit } = useContext(AppContext);
-  const [campaigns, setCampaigns] = React.useState([]);
-  const [sessions, setSessions] = React.useState([]);
-  const [openModal, setOpenModal] = React.useState(false);
-  const [sessionToDelete, setSessionToDelete] = React.useState();
-  const [filteredCamps, setFilteredCamps] = React.useState([]);
-  const [waiting, setWaiting] = React.useState(false);
-
   const classes = useStyles();
 
-  React.useEffect(() => {
+  const { organisationalUnit, isAdmin = false } = useContext(AppContext);
+  const [campaigns, setCampaigns] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState();
+  const [filteredCamps, setFilteredCamps] = useState([]);
+  const [waiting, setWaiting] = useState(false);
+
+  useEffect(() => {
     const isVisibleCampaign = camp => {
+      if (isAdmin) return true;
       const { id } = camp;
       const [, , orgaUnit] = id.split('_');
 
@@ -49,19 +50,25 @@ const TrainingCourses = () => {
     };
 
     setFilteredCamps(campaigns.filter(camp => isVisibleCampaign(camp)));
-  }, [campaigns, organisationalUnit?.id]);
+  }, [campaigns, organisationalUnit?.id, isAdmin]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchCampaigns = async () => {
       const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-      const camps = await getCampaigns(MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM);
+      const camps = await getCampaigns(
+        MASSIVE_ATTACK_API_URL,
+        AUTHENTICATION_MODE,
+        PLATEFORM,
+        isAdmin
+      );
       setCampaigns(await camps.data);
     };
     fetchCampaigns();
-  }, []);
+  }, [isAdmin]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const getTimestamp = id => id.split('_')[3];
+    const getOrganisationalUnit = id => id.split('_')[2];
     const getType = id => id.split('_')[1];
 
     const buildSessions = camps => {
@@ -74,8 +81,14 @@ const TrainingCourses = () => {
           })
           .filter(camp => camp.time === timeStamp && camp.type === type);
         const sessionType = timedCampaigns[0].type;
+        const sessionOrganisationUnit = getOrganisationalUnit(timedCampaigns[0].id);
 
-        return { timeStamp, campaigns: timedCampaigns, type: sessionType };
+        return {
+          timeStamp,
+          campaigns: timedCampaigns,
+          type: sessionType,
+          organisationUnit: sessionOrganisationUnit,
+        };
       };
 
       const timestamps = camps.map(camp => camp.id).map(id => getTimestamp(id) + '_' + getType(id));
@@ -125,7 +138,8 @@ const TrainingCourses = () => {
             <Table aria-label="training courses table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="center">Identifiant</TableCell>
+                  <TableCell align="center">Date de référence</TableCell>
+                  <TableCell align="center">Unité organisationnelle</TableCell>
                   <TableCell align="center">Type de formation</TableCell>
                   <TableCell align="center">Nombre de campagnes</TableCell>
                   <TableCell align="center">Supprimer</TableCell>
@@ -135,6 +149,7 @@ const TrainingCourses = () => {
                 {sessions.map(session => (
                   <TableRow key={session.timeStamp}>
                     <TableCell align="center">{session.timeStamp}</TableCell>
+                    <TableCell align="center">{session.organisationUnit}</TableCell>
                     <TableCell align="center">
                       {session.type === 'I' ? 'Collecte' : 'Gestion'}
                     </TableCell>

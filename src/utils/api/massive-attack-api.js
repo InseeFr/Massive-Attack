@@ -57,13 +57,13 @@ export const getUserOrganisationalUnit = async (urlSabianeData, authenticationMo
       });
   });
 
-export const getCampaigns = async (urlSabianeData, authenticationMode, pf) =>
+export const getCampaigns = async (urlSabianeData, authenticationMode, pf, admin = false) =>
   new Promise((resolve, reject) => {
     authentication(authenticationMode)
       .then(() => {
         Axios.get(`${urlSabianeData}/massive-attack/api/training-courses`, {
           headers: getHeader(authenticationMode),
-          params: { plateform: pf },
+          params: { plateform: pf, admin },
         })
           .then(res => resolve(res))
           .catch(e => {
@@ -85,6 +85,24 @@ export const deleteCampaign = (urlSabianeData, authenticationMode, pf) => async 
         })
           .then(res => resolve(res))
           .catch(e => reject(new Error(`Failed to delete campaign : ${e}`)));
+      })
+      .catch(e => {
+        reject(new Error(`Error during refreshToken : ${e.response.data.error.message}`));
+      });
+  });
+
+export const getOrganisationUnits = async (urlSabianeData, authenticationMode, pf) =>
+  new Promise((resolve, reject) => {
+    authentication(authenticationMode)
+      .then(() => {
+        Axios.get(`${urlSabianeData}/massive-attack/api/organisation-units`, {
+          headers: getHeader(authenticationMode),
+          params: { plateform: pf },
+        })
+          .then(res => resolve(res))
+          .catch(e => {
+            reject(new Error(`Failed to fetch organisation units : ${e}`));
+          });
       })
       .catch(e => {
         reject(new Error(`Error during refreshToken : ${e.response.data.error.message}`));
