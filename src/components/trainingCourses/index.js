@@ -146,21 +146,25 @@ const TrainingCourses = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sessions.map(session => (
-                  <TableRow key={session.timeStamp}>
-                    <TableCell align="center">{session.timeStamp}</TableCell>
-                    <TableCell align="center">{session.organisationUnit}</TableCell>
-                    <TableCell align="center">
-                      {session.type === 'I' ? 'Collecte' : 'Gestion'}
-                    </TableCell>
-                    <TableCell align="center">{session.campaigns.length}</TableCell>
-                    <TableCell align="center">
-                      <IconButton aria-label="delete" onClick={() => selectSession(session)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {sessions.map(session => {
+                  const date = new Date(parseInt(session.timeStamp));
+                  const dateString = `${date.toLocaleDateString()} ${date.getHours()}h${date.getMinutes()}`;
+                  return (
+                    <TableRow key={session.timeStamp}>
+                      <TableCell align="center">{dateString}</TableCell>
+                      <TableCell align="center">{session.organisationUnit}</TableCell>
+                      <TableCell align="center">
+                        {session.type === 'I' ? 'Collecte' : 'Gestion'}
+                      </TableCell>
+                      <TableCell align="center">{session.campaigns.length}</TableCell>
+                      <TableCell align="center">
+                        <IconButton aria-label="delete" onClick={() => selectSession(session)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
