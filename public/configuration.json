@@ -6,6 +6,10 @@
   "_AUTHENTICATION_MODE_COMMENT": "The mode of authentication. ['anonymous','keycloak' ]",
 
   "PLATEFORM":"TRAINING",
-  "_PLATEFORM_COMMENT":"The API may be connected to multiple environnements. [PRODUCTION, TRAINING]"
+  "_PLATEFORM_COMMENT":"The API may be connected to multiple environnements. [PRODUCTION, TRAINING]",
+
+  "ADMIN_ROLE":"admin",
+  "USER_ROLES":["manager", "Guest"]
+
 
 }

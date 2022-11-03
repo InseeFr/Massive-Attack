@@ -6,7 +6,7 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   getHours,
   getMilliseconds,
@@ -17,7 +17,11 @@ import {
   setMinutes,
   setSeconds,
 } from 'date-fns';
-import { getTrainingSessions, postTrainingSession } from '../../utils/api/massive-attack-api';
+import {
+  getOrganisationUnits,
+  getTrainingSessions,
+  postTrainingSession,
+} from '../../utils/api/massive-attack-api';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { AppContext } from '../app/App';
@@ -45,28 +49,40 @@ const useStyles = makeStyles(() => ({
   invalid: {
     color: 'red',
   },
+  title: {
+    fontWeight: 'bold',
+    marginRight: '1em',
+  },
 }));
 
 const Requester = () => {
   const classes = useStyles();
 
-  const defaultValue = { campaignId: 'default' };
+  const defaultValue = { id: 'default', ou: { id: 'unknown', label: 'Select...' } };
+  const { organisationalUnit: contextOU, isAdmin } = useContext(AppContext);
+  const [organisationalUnit, setOrganisationUnit] = useState(contextOU);
+  const [error, setError] = useState(undefined);
+  const [response, setResponse] = useState(undefined);
+  const [waiting, setWaiting] = useState(false);
+  const [availableSessions, setAvailableSessions] = useState(undefined);
+  const [organisationalUnits, setOrganisationalUnits] = useState([]);
 
-  const { organisationalUnit } = useContext(AppContext);
-  const [error, setError] = React.useState(undefined);
-  const [response, setResponse] = React.useState(undefined);
-  const [waiting, setWaiting] = React.useState(false);
-  const [availableSessions, setAvailableSessions] = React.useState(undefined);
-
-  const [campaignId, setCampaignId] = React.useState(defaultValue.campaignId);
-  const [campaignLabel, setCampaignLabel] = React.useState('');
-  const [dateReference, setDateReference] = React.useState(new Date().getTime());
-  const [interviewers, setInterviewers] = React.useState([{ id: '', index: 0 }]);
+  const [campaignId, setCampaignId] = useState(defaultValue.id);
+  const [sessionType, setSessionType] = useState(undefined);
+  const [campaignLabel, setCampaignLabel] = useState('');
+  const [dateReference, setDateReference] = useState(new Date().getTime());
+  const [interviewers, setInterviewers] = useState([{ id: '', index: 0 }]);
 
   const addInterviewer = interviewerId => {
     if (!interviewers.map(inter => inter.id).includes(interviewerId.toUpperCase()))
       setInterviewers([...interviewers, { id: interviewerId, index: interviewers.length }]);
   };
+
+  useEffect(() => {
+    if (!organisationalUnit) {
+      setOrganisationUnit(contextOU);
+    }
+  }, [organisationalUnit, contextOU]);
 
   const removeInterviewer = interviewerIndex => {
     setInterviewers(
@@ -82,7 +98,15 @@ const Requester = () => {
   const updateInterviewer = (newValue, index) => {
     const values = interviewers
       .map(inter => {
-        return inter.index === index ? { ...inter, id: newValue.trim().toUpperCase() } : inter;
+        return inter.index === index
+          ? {
+              ...inter,
+              id: newValue
+                .trim()
+                .substring(0, 6)
+                .toUpperCase(),
+            }
+          : inter;
       })
       .map(inter => inter.id);
     const uniqValues = [...new Set(values)];
@@ -92,7 +116,7 @@ const Requester = () => {
 
   const constructParamsURL = () => {
     const interviewersParamUrl = interviewers.map(inter => `&interviewers=${inter.id}`).join('');
-    return `?campaignId=${campaignId}&campaignLabel=${campaignLabel}&dateReference=${dateReference}${interviewersParamUrl}`;
+    return `?campaignId=${campaignId.label}&campaignLabel=${campaignLabel}&organisationUnitId=${organisationalUnit.id}&dateReference=${dateReference}${interviewersParamUrl}`;
   };
 
   const call = async () => {
@@ -116,8 +140,8 @@ const Requester = () => {
     setInterviewers([{ id: '', index: 0 }]);
   };
 
-  React.useEffect(() => {
-    const getData = async () => {
+  useEffect(() => {
+    const getSessions = async () => {
       const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
       let tempError;
       const sessions = await getTrainingSessions(
@@ -130,7 +154,24 @@ const Requester = () => {
       });
       setAvailableSessions(tempError ? undefined : await sessions.data);
     };
-    getData();
+    getSessions();
+  }, []);
+
+  useEffect(() => {
+    const getOUs = async () => {
+      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
+      let tempError;
+      const ous = await getOrganisationUnits(
+        MASSIVE_ATTACK_API_URL,
+        AUTHENTICATION_MODE,
+        PLATEFORM
+      ).catch(() => {
+        tempError = true;
+        setError(true);
+      });
+      setOrganisationalUnits(tempError ? undefined : await ous.data);
+    };
+    getOUs();
   }, []);
 
   const updateDateReference = stringDate => {
@@ -147,12 +188,46 @@ const Requester = () => {
     setDateReference(newDate.getTime());
   };
 
+  const checkValidity = () => {
+    switch (sessionType) {
+      case 'INTERVIEWER':
+        return interviewers.map(int => int.id).filter(int => int.trim().length > 0).length > 0;
+      case 'MANAGER':
+        return true;
+      default:
+        return false;
+    }
+  };
+  const selectedOU =
+    organisationalUnits?.[organisationalUnits?.map(ou => ou.id).indexOf(organisationalUnit?.id)] ??
+    defaultValue.ou;
+
+  const selectedSession =
+    availableSessions?.[
+      availableSessions?.map(session => session.label).indexOf(campaignId.label)
+    ] ?? defaultValue.id;
+
   return (
     <div className={classes.column}>
       {waiting && <Preloader message="Patientez" />}
       {organisationalUnit && (
         <>
-          <Typography>{`Pôle : ${organisationalUnit.label}`}</Typography>
+          <div className={classes.row}>
+            <Typography className={classes.title}>Pôle</Typography>
+            <Select
+              value={selectedOU}
+              required
+              disabled={!isAdmin}
+              error={organisationalUnit === undefined}
+              onChange={event => setOrganisationUnit(event.target.value)}
+            >
+              {organisationalUnits?.map(ou => (
+                <MenuItem value={ou} key={ou.id}>
+                  {ou.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </div>
           <Divider className={classes.divider} />
           <TextField
             required
@@ -162,16 +237,19 @@ const Requester = () => {
           />
           <Divider className={classes.divider} />
           <Select
-            value={campaignId}
+            value={selectedSession}
             required
-            error={campaignId === defaultValue.campaignId}
-            onChange={event => setCampaignId(event.target.value)}
+            error={campaignId === defaultValue.id}
+            onChange={event => {
+              setCampaignId(event.target.value);
+              setSessionType(event.target.value.type);
+            }}
           >
-            <MenuItem value={defaultValue.campaignId} selected disabled>
+            <MenuItem value={defaultValue.id} selected disabled>
               Choisissez un scénario de formation
             </MenuItem>
             {availableSessions?.map(session => (
-              <MenuItem value={session.label} key={session.label}>
+              <MenuItem value={session} key={session.label}>
                 {session.label}
               </MenuItem>
             ))}
@@ -188,7 +266,7 @@ const Requester = () => {
             onChange={event => updateDateReference(event.target.value)}
           />
           <Divider className={classes.divider} />
-          <Typography>Liste des stagiaires</Typography>
+          <Typography className={classes.title}>Liste des stagiaires</Typography>
           {interviewers.map(inter => (
             <div className={classes.row} key={inter.index}>
               <TextField
@@ -218,7 +296,7 @@ const Requester = () => {
             <AddCircleIcon />
           </IconButton>
           <Divider className={classes.divider} />
-          <Button disabled={waiting} variant="contained" onClick={() => call()}>
+          <Button disabled={waiting || !checkValidity()} variant="contained" onClick={() => call()}>
             Charger un scénario{' '}
           </Button>
           {error && <div>An error occured, sorry </div>}

@@ -6,12 +6,11 @@ import { useEffect, useState } from 'react';
 
 export const useAuth = () => {
   const [authenticated, setAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   // const refreshFunction = useRef(() => {});
   // useInterval(refreshFunction.current, 60000);
 
   // const kcRefresh = () => refreshToken(-1);
-
-  const authorizedRoles = ['manager', 'uma_authorization', 'Guest'];
 
   const accessAuthorized = () => {
     setAuthenticated(true);
@@ -21,7 +20,8 @@ export const useAuth = () => {
     setAuthenticated(false);
   };
 
-  const isAuthorized = roles => roles.filter(r => authorizedRoles.includes(r)).length > 0;
+  const anyMatch = (checkedRoles, targetRoles) =>
+    checkedRoles.filter(r => targetRoles.includes(r)).length > 0;
 
   useEffect(() => {
     const configURL = `${window.location.origin}/configuration.json`;
@@ -32,6 +32,7 @@ export const useAuth = () => {
           case 'anonymous':
             window.localStorage.setItem(LOCALE_STORAGE_USER_KEY, JSON.stringify(GUEST_USER));
             accessAuthorized();
+            setIsAdmin(true);
             break;
 
           case 'keycloak':
@@ -44,13 +45,14 @@ export const useAuth = () => {
                   if (auth) {
                     const userInfos = getTokenInfo();
                     const { roles } = userInfos;
-                    if (isAuthorized(roles)) {
+                    if (anyMatch(roles, [...data.USER_ROLES, data.ADMIN_ROLE])) {
                       window.localStorage.setItem(
                         LOCALE_STORAGE_USER_KEY,
                         JSON.stringify(userInfos)
                       );
                       // refreshFunction.current = kcRefresh;
                       accessAuthorized();
+                      setIsAdmin(anyMatch(roles, [data.ADMIN_ROLE]));
                     } else {
                       accessDenied();
                     }
@@ -65,5 +67,5 @@ export const useAuth = () => {
         }
       });
   });
-  return { authenticated };
+  return { authenticated, isAdmin };
 };
