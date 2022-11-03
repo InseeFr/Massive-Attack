@@ -14,7 +14,7 @@ import { useAuth } from '../../utils/hook/auth';
 export const AppContext = React.createContext();
 
 const App = () => {
-  const { authenticated } = useAuth();
+  const { authenticated, isAdmin } = useAuth();
   const [organisationalUnit, setOrganisationalUnit] = useState();
   const [pf, setPf] = useState('');
 
@@ -32,7 +32,7 @@ const App = () => {
     if (authenticated) fetchUserOrgaUnit();
   }, [authenticated]);
 
-  const context = { organisationalUnit };
+  const context = { organisationalUnit, isAdmin };
 
   return (
     <div>
