@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 
 import Header from '../header';
 import Navigation from '../navigation';
+import OrganisationUnitsVue from '../orgaUnitsVue';
 import Preloader from '../common/Preloader';
 import Requester from '../requester';
 import TrainingCourses from '../trainingCourses';
+import { Typography } from '@material-ui/core';
 import { getConfiguration } from '../../utils/configuration';
 import { getUser } from '../../utils/userInfo';
 import { getUserOrganisationalUnit } from '../../utils/api/massive-attack-api';
@@ -14,7 +16,7 @@ import { useAuth } from '../../utils/hook/auth';
 export const AppContext = React.createContext();
 
 const App = () => {
-  const { authenticated, isAdmin } = useAuth();
+  const { authenticated, isAdmin, pending } = useAuth();
   const [organisationalUnit, setOrganisationalUnit] = useState();
   const [pf, setPf] = useState('');
 
@@ -36,7 +38,12 @@ const App = () => {
 
   return (
     <div>
-      {!authenticated && <Preloader message="Patientez" />}
+      {pending && <Preloader message="Patientez" />}
+      {!pending && !authenticated && (
+        <Typography variant="h2" color="error">
+          Vous n'avez pas les droits pour vous connecter à cette application.
+        </Typography>
+      )}
       {authenticated && (
         <>
           <Header user={getUser()} pf={pf} />
@@ -51,6 +58,7 @@ const App = () => {
                       <Switch>
                         <Route exact path="/" component={Requester} />
                         <Route path="/training-courses" component={TrainingCourses} />
+                        <Route path="/organisation-units-vue" component={OrganisationUnitsVue} />
                       </Switch>
                     </>
                   )}
