@@ -29,10 +29,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const TrainingCourses = () => {
+const OrganisationUnitsVue = () => {
   const classes = useStyles();
 
-  const { organisationalUnit, isAdmin = false } = useContext(AppContext);
+  const { isAdmin = false } = useContext(AppContext);
   const [campaigns, setCampaigns] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -41,18 +41,8 @@ const TrainingCourses = () => {
   const [waiting, setWaiting] = useState(false);
 
   useEffect(() => {
-    const isVisibleCampaign = camp => {
-      if (isAdmin) return true;
-      const { id } = camp;
-      const [, , orgaUnit] = id.split('_');
-
-      return orgaUnit === organisationalUnit?.id;
-    };
-
-    setFilteredCamps(
-      campaigns.filter(({ id }) => id.includes('_')).filter(camp => isVisibleCampaign(camp))
-    );
-  }, [campaigns, organisationalUnit?.id, isAdmin]);
+    setFilteredCamps(campaigns.filter(({ id }) => id.includes('_')));
+  }, [campaigns, isAdmin]);
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -69,34 +59,35 @@ const TrainingCourses = () => {
   }, [isAdmin]);
 
   useEffect(() => {
-    const getTimestamp = id => id.split('_')[3];
     const getOrganisationalUnit = id => id.split('_')[2];
     const getType = id => id.split('_')[1];
 
     const buildSessions = camps => {
       const buildSession = timeStampType => {
-        const [timeStamp, type] = timeStampType.split('_');
-        const timedCampaigns = camps
+        const [ouid, type] = timeStampType.split('_');
+        const ouIdedCampaigns = camps
           .map(camp => {
             const { id } = camp;
-            return { ...camp, time: getTimestamp(id), type: getType(id) };
+            return { ...camp, ouid: getOrganisationalUnit(id), type: getType(id) };
           })
-          .filter(camp => camp.time === timeStamp && camp.type === type);
-        const sessionType = timedCampaigns[0].type;
-        const sessionOrganisationUnit = getOrganisationalUnit(timedCampaigns[0].id);
+          .filter(camp => camp.ouid === ouid && camp.type === type);
+        const sessionType = ouIdedCampaigns[0].type;
+        const sessionOrganisationUnit = getOrganisationalUnit(ouIdedCampaigns[0].id);
 
         return {
-          timeStamp,
-          campaigns: timedCampaigns,
+          ouid,
+          campaigns: ouIdedCampaigns,
           type: sessionType,
           organisationUnit: sessionOrganisationUnit,
         };
       };
 
-      const timestamps = camps.map(camp => camp.id).map(id => getTimestamp(id) + '_' + getType(id));
+      const timestamps = camps
+        .map(camp => camp.id)
+        .map(id => getOrganisationalUnit(id) + '_' + getType(id));
       const uniqTimestamps = [...new Set(timestamps)];
 
-      return uniqTimestamps.map(time => buildSession(time));
+      return uniqTimestamps.map(time => buildSession(time)).sort((a, b) => a.ouid > b.ouid);
     };
 
     setSessions(buildSessions(filteredCamps));
@@ -140,7 +131,6 @@ const TrainingCourses = () => {
             <Table aria-label="training courses table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="center">Date de référence</TableCell>
                   <TableCell align="center">Unité organisationnelle</TableCell>
                   <TableCell align="center">Type de formation</TableCell>
                   <TableCell align="center">Nombre de campagnes</TableCell>
@@ -149,11 +139,8 @@ const TrainingCourses = () => {
               </TableHead>
               <TableBody>
                 {sessions.map(session => {
-                  const date = new Date(parseInt(session.timeStamp));
-                  const dateString = `${date.toLocaleDateString()} ${date.getHours()}h${date.getMinutes()}`;
                   return (
                     <TableRow key={session.timeStamp}>
-                      <TableCell align="center">{dateString}</TableCell>
                       <TableCell align="center">{session.organisationUnit}</TableCell>
                       <TableCell align="center">
                         {session.type === 'I' ? 'Collecte' : 'Gestion'}
@@ -171,7 +158,7 @@ const TrainingCourses = () => {
             </Table>
           </TableContainer>
           <Dialog onClose={handleClose} open={openModal}>
-            <Typography variant="h6">{`Suppression de la session ${sessionToDelete?.type} ${sessionToDelete?.timeStamp}`}</Typography>
+            <Typography variant="h6">{`Suppression des ${sessionToDelete?.campaigns?.length} ${sessionToDelete?.type} ${sessionToDelete?.ouid}`}</Typography>
             <div className={classes.row}>
               <Button onClick={handleClose}>Annuler</Button>
               <Button onClick={confirmDeletion}>Valider</Button>
@@ -183,4 +170,4 @@ const TrainingCourses = () => {
   );
 };
 
-export default TrainingCourses;
+export default OrganisationUnitsVue;

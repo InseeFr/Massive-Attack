@@ -1,7 +1,9 @@
 import { Paper, Tab, Tabs } from '@material-ui/core';
+import React, { useContext } from 'react';
 
+import { AppContext } from '../app/App';
 import { Link } from 'react-router-dom';
-import React from 'react';
+import StarIcon from '@material-ui/icons/Star';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -12,7 +14,9 @@ const useStyles = makeStyles({
 
 const Navigation = ({ location }) => {
   const classes = useStyles();
+  const { isAdmin } = useContext(AppContext);
 
+  const adminIcon = <StarIcon color="error"></StarIcon>;
   return (
     <Paper className={classes.root}>
       <Tabs value={location.pathname}>
@@ -22,6 +26,14 @@ const Navigation = ({ location }) => {
           value="/training-courses"
           component={Link}
           to="/training-courses"
+        ></Tab>
+        <Tab
+          label="Administration"
+          value="/organisation-units-vue"
+          component={Link}
+          to="/organisation-units-vue"
+          icon={adminIcon}
+          disabled={!isAdmin}
         ></Tab>
       </Tabs>
     </Paper>
