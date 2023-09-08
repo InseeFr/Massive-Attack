@@ -6,6 +6,7 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   getHours,
@@ -22,6 +23,7 @@ import {
   getTrainingSessions,
   postTrainingSession,
 } from '../../utils/api/massive-attack-api';
+import { handleCSVUpload } from './CsvUploader';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { AppContext } from '../app/App';
@@ -66,12 +68,13 @@ const Requester = () => {
   const [waiting, setWaiting] = useState(false);
   const [availableSessions, setAvailableSessions] = useState(undefined);
   const [organisationalUnits, setOrganisationalUnits] = useState([]);
-
   const [campaignId, setCampaignId] = useState(defaultValue.id);
   const [sessionType, setSessionType] = useState(undefined);
   const [campaignLabel, setCampaignLabel] = useState('');
   const [dateReference, setDateReference] = useState(new Date().getTime());
   const [interviewers, setInterviewers] = useState([{ id: '', index: 0 }]);
+  const [invalidValues, setInvalidValues] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const addInterviewer = interviewerId => {
     if (!interviewers.map(inter => inter.id).includes(interviewerId.toUpperCase()))
@@ -134,7 +137,8 @@ const Requester = () => {
     });
     setWaiting(false);
     setResponse(await callResponse?.data.campaign);
-    // to prevent sending another session with same timestamp
+    // to prevent sending another session with the same timestamp
+    setSuccessMessage('The training session was a success!');
     setDateReference(new Date().getTime());
     setCampaignId('default');
     setInterviewers([{ id: '', index: 0 }]);
@@ -198,6 +202,7 @@ const Requester = () => {
         return false;
     }
   };
+
   const selectedOU =
     organisationalUnits?.[organisationalUnits?.map(ou => ou.id).indexOf(organisationalUnit?.id)] ??
     defaultValue.ou;
@@ -267,6 +272,16 @@ const Requester = () => {
           />
           <Divider className={classes.divider} />
           <Typography className={classes.title}>Liste des stagiaires</Typography>
+          <div style={{ display: 'flex', margin: '15px 0 15px 0' }}>
+            <Typography className={classes.title}>
+              Importer une liste de stagiaires par fichier CSV
+            </Typography>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={event => handleCSVUpload(event, setInterviewers, setInvalidValues)}
+            />
+          </div>
           {interviewers.map(inter => (
             <div className={classes.row} key={inter.index}>
               <TextField
@@ -295,12 +310,30 @@ const Requester = () => {
           >
             <AddCircleIcon />
           </IconButton>
+          {successMessage && (
+            <Alert style={{ width: 'fit-content', margin: '2em 0 2em 2em' }} severity="success">
+              {successMessage}
+            </Alert>
+          )}
+          {error && (
+            <Alert style={{ width: 'fit-content', margin: '2em 0 2em 2em' }} severity="error">
+              An error occurred — <strong>Please contact support</strong>
+            </Alert>
+          )}
+          {invalidValues.length > 0 && (
+            <Alert style={{ width: 'fit-content', margin: '2em 0 2em 2em' }} severity="warning">
+              The following elements were not considered (expected: 6 uppercase characters):
+              {invalidValues.map((value, index) => (
+                <div key={index}>{value}</div>
+              ))}
+            </Alert>
+          )}
+
           <Divider className={classes.divider} />
           <Button disabled={waiting || !checkValidity()} variant="contained" onClick={() => call()}>
-            Charger un scénario{' '}
+            Load Scenario
           </Button>
-          {error && <div>An error occured, sorry </div>}
-          {response && <div>{`Résultat : ${response}`}</div>}
+          {response && <div>{`Result: ${response}`}</div>}
         </>
       )}
     </div>
