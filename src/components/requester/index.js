@@ -77,13 +77,13 @@ const Requester = () => {
     sessionType,
     setSessionType,
   } = useContext(AppContext);
-  const [error, setError] = useState(undefined);
+  const [setError] = useState(undefined);
   const [response, setResponse] = useState(undefined);
   const [waiting, setWaiting] = useState(false);
   const [availableSessions, setAvailableSessions] = useState(undefined);
   const [organisationalUnits, setOrganisationalUnits] = useState([]);
-  const [invalidValues, setInvalidValues] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [setInvalidValues] = useState([]);
+  const [setSuccessMessage] = useState('');
   const [alerts, setAlerts] = useState([]);
 
   const showAlert = (message, severity) => {
