@@ -61,20 +61,40 @@ const Requester = () => {
   const classes = useStyles();
 
   const defaultValue = { id: 'default', ou: { id: 'unknown', label: 'Select...' } };
-  const { organisationalUnit: contextOU, isAdmin } = useContext(AppContext);
-  const [organisationalUnit, setOrganisationUnit] = useState(contextOU);
+  const {
+    organisationalUnit: contextOU,
+    isAdmin,
+    dateReference,
+    setDateReference,
+    campaignLabel,
+    setCampaignLabel,
+    campaignId,
+    setCampaignId,
+    organisationalUnit,
+    setOrganisationalUnit,
+    interviewers,
+    setInterviewers,
+    sessionType,
+    setSessionType,
+  } = useContext(AppContext);
   const [error, setError] = useState(undefined);
   const [response, setResponse] = useState(undefined);
   const [waiting, setWaiting] = useState(false);
   const [availableSessions, setAvailableSessions] = useState(undefined);
   const [organisationalUnits, setOrganisationalUnits] = useState([]);
-  const [campaignId, setCampaignId] = useState(defaultValue.id);
-  const [sessionType, setSessionType] = useState(undefined);
-  const [campaignLabel, setCampaignLabel] = useState('');
-  const [dateReference, setDateReference] = useState(new Date().getTime());
-  const [interviewers, setInterviewers] = useState([{ id: '', index: 0 }]);
   const [invalidValues, setInvalidValues] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
+  const [alerts, setAlerts] = useState([]);
+
+  const showAlert = (message, severity) => {
+    const newAlert = { message, severity };
+    setAlerts(prevAlerts => [...prevAlerts, newAlert]);
+
+    const timeoutId = setTimeout(() => {
+      setAlerts(prevAlerts => prevAlerts.filter(alert => alert !== newAlert));
+    }, 5000);
+    newAlert.timeoutId = timeoutId;
+  };
 
   const addInterviewer = interviewerId => {
     if (!interviewers.map(inter => inter.id).includes(interviewerId.toUpperCase()))
@@ -83,9 +103,9 @@ const Requester = () => {
 
   useEffect(() => {
     if (!organisationalUnit) {
-      setOrganisationUnit(contextOU);
+      setOrganisationalUnit(contextOU);
     }
-  }, [organisationalUnit, contextOU]);
+  }, [organisationalUnit, contextOU, setOrganisationalUnit]);
 
   const removeInterviewer = interviewerIndex => {
     setInterviewers(
@@ -133,12 +153,14 @@ const Requester = () => {
       PLATEFORM
     ).catch(e => {
       setError(true);
+      showAlert('An error occurred — <strong>Please contact support.', 'error');
       console.log(e);
     });
     setWaiting(false);
     setResponse(await callResponse?.data.campaign);
     // to prevent sending another session with the same timestamp
     setSuccessMessage('The training session was a success!');
+    showAlert('The training session was a success!', 'success');
     setDateReference(new Date().getTime());
     setCampaignId('default');
     setInterviewers([{ id: '', index: 0 }]);
@@ -211,7 +233,6 @@ const Requester = () => {
     availableSessions?.[
       availableSessions?.map(session => session.label).indexOf(campaignId.label)
     ] ?? defaultValue.id;
-
   return (
     <div className={classes.column}>
       {waiting && <Preloader message="Patientez" />}
@@ -224,7 +245,7 @@ const Requester = () => {
               required
               disabled={!isAdmin}
               error={organisationalUnit === undefined}
-              onChange={event => setOrganisationUnit(event.target.value)}
+              onChange={event => setOrganisationalUnit(event.target.value)}
             >
               {organisationalUnits?.map(ou => (
                 <MenuItem value={ou} key={ou.id}>
@@ -239,6 +260,7 @@ const Requester = () => {
             label="Label de la formation"
             error={campaignLabel === ''}
             onChange={event => setCampaignLabel(event.target.value)}
+            value={campaignLabel}
           />
           <Divider className={classes.divider} />
           <Select
@@ -279,7 +301,17 @@ const Requester = () => {
             <input
               type="file"
               accept=".csv"
-              onChange={event => handleCSVUpload(event, setInterviewers, setInvalidValues)}
+              onChange={event =>
+                handleCSVUpload(
+                  event,
+                  setInterviewers,
+                  setInvalidValues,
+                  showAlert(
+                    'The following elements were not considered (expected: 6 uppercase characters):',
+                    'warning'
+                  )
+                )
+              }
             />
           </div>
           {interviewers.map(inter => (
@@ -310,25 +342,15 @@ const Requester = () => {
           >
             <AddCircleIcon />
           </IconButton>
-          {successMessage && (
-            <Alert style={{ width: 'fit-content', margin: '2em 0 2em 2em' }} severity="success">
-              {successMessage}
+          {alerts.map((alert, index) => (
+            <Alert
+              key={index}
+              style={{ width: 'fit-content', margin: '2em 0 2em 2em' }}
+              severity={alert.severity}
+            >
+              {alert.message}
             </Alert>
-          )}
-          {error && (
-            <Alert style={{ width: 'fit-content', margin: '2em 0 2em 2em' }} severity="error">
-              An error occurred — <strong>Please contact support</strong>
-            </Alert>
-          )}
-          {invalidValues.length > 0 && (
-            <Alert style={{ width: 'fit-content', margin: '2em 0 2em 2em' }} severity="warning">
-              The following elements were not considered (expected: 6 uppercase characters):
-              {invalidValues.map((value, index) => (
-                <div key={index}>{value}</div>
-              ))}
-            </Alert>
-          )}
-
+          ))}
           <Divider className={classes.divider} />
           <Button disabled={waiting || !checkValidity()} variant="contained" onClick={() => call()}>
             Load Scenario
