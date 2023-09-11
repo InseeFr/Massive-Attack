@@ -181,7 +181,7 @@ const Requester = () => {
       setAvailableSessions(tempError ? undefined : await sessions.data);
     };
     getSessions();
-  }, []);
+  }, [setError]);
 
   useEffect(() => {
     const getOUs = async () => {
@@ -198,7 +198,7 @@ const Requester = () => {
       setOrganisationalUnits(tempError ? undefined : await ous.data);
     };
     getOUs();
-  }, []);
+  }, [setError]);
 
   const updateDateReference = stringDate => {
     let newDate = new Date(stringDate);
