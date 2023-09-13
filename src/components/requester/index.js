@@ -77,13 +77,13 @@ const Requester = () => {
     sessionType,
     setSessionType,
   } = useContext(AppContext);
-  const [setError] = useState(undefined);
+  const [error, setError] = useState(undefined);
   const [response, setResponse] = useState(undefined);
   const [waiting, setWaiting] = useState(false);
   const [availableSessions, setAvailableSessions] = useState(undefined);
   const [organisationalUnits, setOrganisationalUnits] = useState([]);
-  const [setInvalidValues] = useState([]);
-  const [setSuccessMessage] = useState('');
+  const [invalidValues, setInvalidValues] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
   const [alerts, setAlerts] = useState([]);
 
   const showAlert = (message, severity) => {
@@ -141,7 +141,6 @@ const Requester = () => {
     const interviewersParamUrl = interviewers.map(inter => `&interviewers=${inter.id}`).join('');
     return `?campaignId=${campaignId.label}&campaignLabel=${campaignLabel}&organisationUnitId=${organisationalUnit.id}&dateReference=${dateReference}${interviewersParamUrl}`;
   };
-
   const call = async () => {
     setWaiting(true);
     const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
@@ -154,14 +153,16 @@ const Requester = () => {
     ).catch(e => {
       setError(true);
       showAlert('An error occurred — <strong>Please contact support.', 'error');
+      console.error(error);
+      console.error(invalidValues);
       console.log(e);
     });
     setWaiting(false);
     setResponse(await callResponse?.data.campaign);
     // to prevent sending another session with the same timestamp
     setSuccessMessage('The training session was a success!');
+    console.error(successMessage);
     showAlert('The training session was a success!', 'success');
-    setDateReference(new Date().getTime());
     setCampaignId('default');
     setInterviewers([{ id: '', index: 0 }]);
   };
@@ -302,15 +303,7 @@ const Requester = () => {
               type="file"
               accept=".csv"
               onChange={event =>
-                handleCSVUpload(
-                  event,
-                  setInterviewers,
-                  setInvalidValues,
-                  showAlert(
-                    'The following elements were not considered (expected: 6 uppercase characters):',
-                    'warning'
-                  )
-                )
+                handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
               }
             />
           </div>
