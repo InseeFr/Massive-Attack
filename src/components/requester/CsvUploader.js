@@ -1,6 +1,5 @@
 import Papa from 'papaparse';
-
-export const handleCSVUpload = async (event, setInterviewers, setInvalidValues) => {
+export const handleCSVUpload = async (event, setInterviewers, setInvalidValues, showAlert) => {
   const file = event.target.files[0];
   const reader = new FileReader();
 
@@ -41,6 +40,16 @@ export const handleCSVUpload = async (event, setInterviewers, setInvalidValues) 
         setInterviewers(allValues.map((value, index) => ({ id: value, index })));
         // Update the 'invalidValues' state with invalid values
         setInvalidValues(newInvalidValues);
+
+        // Show the alert with the message including invalidValues
+        if (newInvalidValues.length > 0) {
+          showAlert(
+            `The following elements were not considered (expected: 6 uppercase characters): ${newInvalidValues.join(
+              ', '
+            )}`,
+            'warning'
+          );
+        }
       },
       error: error => {
         console.error('Error parsing the CSV file:', error.message);
