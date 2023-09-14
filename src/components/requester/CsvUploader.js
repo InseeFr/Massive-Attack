@@ -21,12 +21,7 @@ export const handleCSVUpload = async (event, setInterviewers, setInvalidValues, 
           // Iterate through each column of the row
           Object.keys(row).forEach(columnName => {
             const value = row[columnName];
-            if (
-              value !== null &&
-              typeof value === 'string' &&
-              value.trim().length === 6 &&
-              value.trim().toUpperCase() === value.trim()
-            ) {
+            if (value !== null && typeof value === 'string' && value.trim().length === 6) {
               allValues.push(value.trim().toUpperCase());
             } else {
               if (value !== null) {
