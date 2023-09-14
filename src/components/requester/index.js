@@ -80,8 +80,9 @@ const Requester = () => {
     setInterviewers,
     sessionType,
     setSessionType,
+    error,
+    setError,
   } = useContext(AppContext);
-  const [error, setError] = useState(undefined);
   const [response, setResponse] = useState(undefined);
   const [waiting, setWaiting] = useState(false);
   const [availableSessions, setAvailableSessions] = useState(undefined);
@@ -104,6 +105,23 @@ const Requester = () => {
     if (!interviewers.map(inter => inter.id).includes(interviewerId.toUpperCase()))
       setInterviewers([...interviewers, { id: interviewerId, index: interviewers.length }]);
   };
+
+  useEffect(() => {
+    const getSessions = async () => {
+      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
+      let tempError;
+      const sessions = await getTrainingSessions(
+        MASSIVE_ATTACK_API_URL,
+        AUTHENTICATION_MODE,
+        PLATEFORM
+      ).catch(() => {
+        tempError = true;
+        setError(true);
+      });
+      setAvailableSessions(tempError ? undefined : await sessions.data);
+    };
+    getSessions();
+  }, [setError]);
 
   useEffect(() => {
     if (!organisationalUnit) {
@@ -173,23 +191,6 @@ const Requester = () => {
     setCampaignId('default');
     setInterviewers([{ id: '', index: 0 }]);
   };
-
-  useEffect(() => {
-    const getSessions = async () => {
-      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-      let tempError;
-      const sessions = await getTrainingSessions(
-        MASSIVE_ATTACK_API_URL,
-        AUTHENTICATION_MODE,
-        PLATEFORM
-      ).catch(() => {
-        tempError = true;
-        setError(true);
-      });
-      setAvailableSessions(tempError ? undefined : await sessions.data);
-    };
-    getSessions();
-  }, [setError]);
 
   useEffect(() => {
     const getOUs = async () => {

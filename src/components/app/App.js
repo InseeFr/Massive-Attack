@@ -24,6 +24,7 @@ const App = () => {
   const [campaignId, setCampaignId] = useState('');
   const [interviewers, setInterviewers] = useState([{ id: '', index: 0 }]);
   const [sessionType, setSessionType] = useState(undefined);
+  const [error, setError] = useState(undefined);
 
   useEffect(() => {
     const fetchUserOrgaUnit = async () => {
@@ -53,6 +54,8 @@ const App = () => {
     setInterviewers,
     sessionType,
     setSessionType,
+    error,
+    setError,
   };
 
   return (
