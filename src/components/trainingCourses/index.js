@@ -179,7 +179,7 @@ const TrainingCourses = () => {
           </TableContainer>
           <Dialog onClose={handleClose} open={openModal}>
             <div className={classes.dialogContent}>
-              <Typography variant="h6">{`Suppression de la session ${sessionToDelete?.type} ${sessionToDelete?.timeStamp}}`}</Typography>
+              <Typography variant="h6">{`Suppression de la session ${sessionToDelete?.type} ${sessionToDelete?.timeStamp}`}</Typography>
               <div className={classes.row}>
                 <Button variant="outlined" className={classes.cancelButton} onClick={handleClose}>
                   Annuler
