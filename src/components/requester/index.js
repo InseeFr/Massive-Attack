@@ -59,6 +59,10 @@ const useStyles = makeStyles(theme => ({
     width: 'fit-content',
     margin: theme.spacing(2, 0, 2, 2),
   },
+  csvImport: {
+    margin: theme.spacing(2, 0, 2, 0),
+    display: 'flex',
+  },
 }));
 
 const Requester = () => {
@@ -303,7 +307,7 @@ const Requester = () => {
           />
           <Divider className={classes.divider} />
           <Typography className={classes.title}>Liste des stagiaires</Typography>
-          <div style={{ display: 'flex', margin: '15px 0 15px 0' }}>
+          <div className={classes.csvImport}>
             <Typography className={classes.title}>
               Importer une liste de stagiaires par fichier CSV
             </Typography>
