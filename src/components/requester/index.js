@@ -86,12 +86,15 @@ const Requester = () => {
     setSessionType,
     error,
     setError,
+    organisationalUnits,
+    setOrganisationalUnits,
+    availableSessions,
+    setAvailableSessions,
   } = useContext(AppContext);
   const [response, setResponse] = useState(undefined);
   const [waiting, setWaiting] = useState(false);
-  const [availableSessions, setAvailableSessions] = useState(undefined);
-  const [organisationalUnits, setOrganisationalUnits] = useState([]);
   const [invalidValues, setInvalidValues] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [successMessage, setSuccessMessage] = useState('');
   const [alerts, setAlerts] = useState([]);
 
@@ -125,7 +128,7 @@ const Requester = () => {
       setAvailableSessions(tempError ? undefined : await sessions.data);
     };
     getSessions();
-  }, [setError]);
+  }, [setError, setAvailableSessions]);
 
   useEffect(() => {
     if (!organisationalUnit) {
@@ -189,7 +192,6 @@ const Requester = () => {
     setWaiting(false);
     setResponse(await callResponse?.data.campaign);
     // to prevent sending another session with the same timestamp
-    setSuccessMessage('The training session was a success!');
     console.error(successMessage);
     showAlert('The training session was a success!', 'success');
     setCampaignId('default');
@@ -211,7 +213,7 @@ const Requester = () => {
       setOrganisationalUnits(tempError ? undefined : await ous.data);
     };
     getOUs();
-  }, [setError]);
+  }, [setError, setOrganisationalUnits]);
 
   const updateDateReference = stringDate => {
     let newDate = new Date(stringDate);
