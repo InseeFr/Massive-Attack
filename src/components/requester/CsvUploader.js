@@ -52,6 +52,7 @@ export const handleCSVUpload = async (event, setInterviewers, setInvalidValues, 
         }
       },
       error: error => {
+        showAlert(`Erreur lors de l'analyse du fichier CSV : ${error.message}`, 'error');
         console.error('Error parsing the CSV file:', error.message);
       },
     });
