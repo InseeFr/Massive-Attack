@@ -6,6 +6,7 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   getHours,
@@ -22,6 +23,7 @@ import {
   getTrainingSessions,
   postTrainingSession,
 } from '../../utils/api/massive-attack-api';
+import { handleCSVUpload } from './CsvUploader';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { AppContext } from '../app/App';
@@ -31,7 +33,7 @@ import Preloader from '../common/Preloader';
 import Select from '@material-ui/core/Select';
 import { getConfiguration } from '../../utils/configuration';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   column: {
     display: 'flex',
     flexDirection: 'column',
@@ -53,25 +55,58 @@ const useStyles = makeStyles(() => ({
     fontWeight: 'bold',
     marginRight: '1em',
   },
+  alertContainer: {
+    width: 'fit-content',
+    margin: theme.spacing(2, 0, 2, 2),
+  },
+  csvImport: {
+    margin: theme.spacing(2, 0, 2, 0),
+    display: 'flex',
+  },
 }));
 
 const Requester = () => {
   const classes = useStyles();
 
   const defaultValue = { id: 'default', ou: { id: 'unknown', label: 'Select...' } };
-  const { organisationalUnit: contextOU, isAdmin } = useContext(AppContext);
-  const [organisationalUnit, setOrganisationUnit] = useState(contextOU);
-  const [error, setError] = useState(undefined);
+  const {
+    organisationalUnit: contextOU,
+    isAdmin,
+    dateReference,
+    setDateReference,
+    campaignLabel,
+    setCampaignLabel,
+    campaignId,
+    setCampaignId,
+    organisationalUnit,
+    setOrganisationalUnit,
+    interviewers,
+    setInterviewers,
+    sessionType,
+    setSessionType,
+    error,
+    setError,
+    organisationalUnits,
+    setOrganisationalUnits,
+    availableSessions,
+    setAvailableSessions,
+  } = useContext(AppContext);
   const [response, setResponse] = useState(undefined);
   const [waiting, setWaiting] = useState(false);
-  const [availableSessions, setAvailableSessions] = useState(undefined);
-  const [organisationalUnits, setOrganisationalUnits] = useState([]);
+  const [invalidValues, setInvalidValues] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [successMessage, setSuccessMessage] = useState('');
+  const [alerts, setAlerts] = useState([]);
 
-  const [campaignId, setCampaignId] = useState(defaultValue.id);
-  const [sessionType, setSessionType] = useState(undefined);
-  const [campaignLabel, setCampaignLabel] = useState('');
-  const [dateReference, setDateReference] = useState(new Date().getTime());
-  const [interviewers, setInterviewers] = useState([{ id: '', index: 0 }]);
+  const showAlert = (message, severity) => {
+    const newAlert = { message, severity };
+    setAlerts(prevAlerts => [...prevAlerts, newAlert]);
+
+    const timeoutId = setTimeout(() => {
+      setAlerts(prevAlerts => prevAlerts.filter(alert => alert !== newAlert));
+    }, 5000);
+    newAlert.timeoutId = timeoutId;
+  };
 
   const addInterviewer = interviewerId => {
     if (!interviewers.map(inter => inter.id).includes(interviewerId.toUpperCase()))
@@ -79,10 +114,27 @@ const Requester = () => {
   };
 
   useEffect(() => {
+    const getSessions = async () => {
+      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
+      let tempError;
+      const sessions = await getTrainingSessions(
+        MASSIVE_ATTACK_API_URL,
+        AUTHENTICATION_MODE,
+        PLATEFORM
+      ).catch(() => {
+        tempError = true;
+        setError(true);
+      });
+      setAvailableSessions(tempError ? undefined : await sessions.data);
+    };
+    getSessions();
+  }, [setError, setAvailableSessions]);
+
+  useEffect(() => {
     if (!organisationalUnit) {
-      setOrganisationUnit(contextOU);
+      setOrganisationalUnit(contextOU);
     }
-  }, [organisationalUnit, contextOU]);
+  }, [organisationalUnit, contextOU, setOrganisationalUnit]);
 
   const removeInterviewer = interviewerIndex => {
     setInterviewers(
@@ -118,10 +170,12 @@ const Requester = () => {
     const interviewersParamUrl = interviewers.map(inter => `&interviewers=${inter.id}`).join('');
     return `?campaignId=${campaignId.label}&campaignLabel=${campaignLabel}&organisationUnitId=${organisationalUnit.id}&dateReference=${dateReference}${interviewersParamUrl}`;
   };
-
   const call = async () => {
     setWaiting(true);
     const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
+    if (campaignLabel.length > 10) {
+      setCampaignLabel(campaignLabel.substring(0, 10));
+    }
     const parametrizedUrl =
       MASSIVE_ATTACK_API_URL + '/massive-attack/api/training-course' + constructParamsURL();
     const callResponse = await postTrainingSession(
@@ -130,32 +184,19 @@ const Requester = () => {
       PLATEFORM
     ).catch(e => {
       setError(true);
+      showAlert('An error occurred — <strong>Please contact support.', 'error');
+      console.error(error);
+      console.error(invalidValues);
       console.log(e);
     });
     setWaiting(false);
     setResponse(await callResponse?.data.campaign);
-    // to prevent sending another session with same timestamp
-    setDateReference(new Date().getTime());
+    // to prevent sending another session with the same timestamp
+    console.error(successMessage);
+    showAlert('The training session was a success!', 'success');
     setCampaignId('default');
     setInterviewers([{ id: '', index: 0 }]);
   };
-
-  useEffect(() => {
-    const getSessions = async () => {
-      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-      let tempError;
-      const sessions = await getTrainingSessions(
-        MASSIVE_ATTACK_API_URL,
-        AUTHENTICATION_MODE,
-        PLATEFORM
-      ).catch(() => {
-        tempError = true;
-        setError(true);
-      });
-      setAvailableSessions(tempError ? undefined : await sessions.data);
-    };
-    getSessions();
-  }, []);
 
   useEffect(() => {
     const getOUs = async () => {
@@ -172,7 +213,7 @@ const Requester = () => {
       setOrganisationalUnits(tempError ? undefined : await ous.data);
     };
     getOUs();
-  }, []);
+  }, [setError, setOrganisationalUnits]);
 
   const updateDateReference = stringDate => {
     let newDate = new Date(stringDate);
@@ -198,6 +239,7 @@ const Requester = () => {
         return false;
     }
   };
+
   const selectedOU =
     organisationalUnits?.[organisationalUnits?.map(ou => ou.id).indexOf(organisationalUnit?.id)] ??
     defaultValue.ou;
@@ -206,7 +248,6 @@ const Requester = () => {
     availableSessions?.[
       availableSessions?.map(session => session.label).indexOf(campaignId.label)
     ] ?? defaultValue.id;
-
   return (
     <div className={classes.column}>
       {waiting && <Preloader message="Patientez" />}
@@ -219,7 +260,7 @@ const Requester = () => {
               required
               disabled={!isAdmin}
               error={organisationalUnit === undefined}
-              onChange={event => setOrganisationUnit(event.target.value)}
+              onChange={event => setOrganisationalUnit(event.target.value)}
             >
               {organisationalUnits?.map(ou => (
                 <MenuItem value={ou} key={ou.id}>
@@ -231,9 +272,10 @@ const Requester = () => {
           <Divider className={classes.divider} />
           <TextField
             required
-            label="Label de la formation"
+            label="Label de la formation (10 caractères maximum)"
             error={campaignLabel === ''}
             onChange={event => setCampaignLabel(event.target.value)}
+            value={campaignLabel}
           />
           <Divider className={classes.divider} />
           <Select
@@ -267,6 +309,18 @@ const Requester = () => {
           />
           <Divider className={classes.divider} />
           <Typography className={classes.title}>Liste des stagiaires</Typography>
+          <div className={classes.csvImport}>
+            <Typography className={classes.title}>
+              Importer une liste de stagiaires par fichier CSV
+            </Typography>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={event =>
+                handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
+              }
+            />
+          </div>
           {interviewers.map(inter => (
             <div className={classes.row} key={inter.index}>
               <TextField
@@ -295,12 +349,16 @@ const Requester = () => {
           >
             <AddCircleIcon />
           </IconButton>
+          {alerts.map((alert, index) => (
+            <Alert key={index} className={classes.alertContainer} severity={alert.severity}>
+              {alert.message}
+            </Alert>
+          ))}
           <Divider className={classes.divider} />
           <Button disabled={waiting || !checkValidity()} variant="contained" onClick={() => call()}>
-            Charger un scénario{' '}
+            Load Scenario
           </Button>
-          {error && <div>An error occured, sorry </div>}
-          {response && <div>{`Résultat : ${response}`}</div>}
+          {response && <div>{`Result: ${response}`}</div>}
         </>
       )}
     </div>

@@ -19,6 +19,14 @@ const App = () => {
   const { authenticated, isAdmin, pending } = useAuth();
   const [organisationalUnit, setOrganisationalUnit] = useState();
   const [pf, setPf] = useState('');
+  const [dateReference, setDateReference] = useState(new Date().getTime());
+  const [campaignLabel, setCampaignLabel] = useState();
+  const [campaignId, setCampaignId] = useState('');
+  const [interviewers, setInterviewers] = useState([{ id: '', index: 0 }]);
+  const [sessionType, setSessionType] = useState(undefined);
+  const [error, setError] = useState(undefined);
+  const [organisationalUnits, setOrganisationalUnits] = useState([]);
+  const [availableSessions, setAvailableSessions] = useState(undefined);
 
   useEffect(() => {
     const fetchUserOrgaUnit = async () => {
@@ -34,7 +42,27 @@ const App = () => {
     if (authenticated) fetchUserOrgaUnit();
   }, [authenticated]);
 
-  const context = { organisationalUnit, isAdmin };
+  const context = {
+    organisationalUnit,
+    setOrganisationalUnit,
+    isAdmin,
+    dateReference,
+    setDateReference,
+    campaignLabel,
+    setCampaignLabel,
+    campaignId,
+    setCampaignId,
+    interviewers,
+    setInterviewers,
+    sessionType,
+    setSessionType,
+    error,
+    setError,
+    organisationalUnits,
+    setOrganisationalUnits,
+    availableSessions,
+    setAvailableSessions,
+  };
 
   return (
     <div>

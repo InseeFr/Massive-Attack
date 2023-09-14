@@ -20,12 +20,24 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Preloader from '../common/Preloader';
 import { getConfiguration } from '../../utils/configuration/index';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   row: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
     margin: '1em',
+  },
+  dialogContent: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing(2),
+  },
+  cancelButton: {
+    marginRight: theme.spacing(2),
   },
 }));
 
@@ -158,10 +170,16 @@ const OrganisationUnitsVue = () => {
             </Table>
           </TableContainer>
           <Dialog onClose={handleClose} open={openModal}>
-            <Typography variant="h6">{`Suppression des ${sessionToDelete?.campaigns?.length} ${sessionToDelete?.type} ${sessionToDelete?.ouid}`}</Typography>
-            <div className={classes.row}>
-              <Button onClick={handleClose}>Annuler</Button>
-              <Button onClick={confirmDeletion}>Valider</Button>
+            <div className={classes.dialogContent}>
+              <Typography variant="h6">{`Suppression des ${sessionToDelete?.campaigns?.length} ${sessionToDelete?.type} ${sessionToDelete?.ouid}`}</Typography>
+              <div className={classes.buttonContainer}>
+                <Button variant="outlined" className={classes.cancelButton} onClick={handleClose}>
+                  Annuler
+                </Button>
+                <Button variant="contained" color="primary" onClick={confirmDeletion}>
+                  Valider
+                </Button>
+              </div>
             </div>
           </Dialog>
         </>
