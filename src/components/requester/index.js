@@ -33,7 +33,7 @@ import Preloader from '../common/Preloader';
 import Select from '@material-ui/core/Select';
 import { getConfiguration } from '../../utils/configuration';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   column: {
     display: 'flex',
     flexDirection: 'column',
@@ -54,6 +54,10 @@ const useStyles = makeStyles(() => ({
   title: {
     fontWeight: 'bold',
     marginRight: '1em',
+  },
+  alertContainer: {
+    width: 'fit-content',
+    margin: theme.spacing(2, 0, 2, 2),
   },
 }));
 
@@ -144,6 +148,9 @@ const Requester = () => {
   const call = async () => {
     setWaiting(true);
     const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
+    if (campaignLabel.length > 10) {
+      setCampaignLabel(campaignLabel.substring(0, 10));
+    }
     const parametrizedUrl =
       MASSIVE_ATTACK_API_URL + '/massive-attack/api/training-course' + constructParamsURL();
     const callResponse = await postTrainingSession(
@@ -258,7 +265,7 @@ const Requester = () => {
           <Divider className={classes.divider} />
           <TextField
             required
-            label="Label de la formation"
+            label="Label de la formation (10 caractères maximum)"
             error={campaignLabel === ''}
             onChange={event => setCampaignLabel(event.target.value)}
             value={campaignLabel}
@@ -336,11 +343,7 @@ const Requester = () => {
             <AddCircleIcon />
           </IconButton>
           {alerts.map((alert, index) => (
-            <Alert
-              key={index}
-              style={{ width: 'fit-content', margin: '2em 0 2em 2em' }}
-              severity={alert.severity}
-            >
+            <Alert key={index} className={classes.alertContainer} severity={alert.severity}>
               {alert.message}
             </Alert>
           ))}
