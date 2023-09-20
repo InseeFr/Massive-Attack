@@ -170,7 +170,9 @@ const Requester = () => {
     const interviewersParamUrl = interviewers.map(inter => `&interviewers=${inter.id}`).join('');
     return `?campaignId=${campaignId.label}&campaignLabel=${campaignLabel}&organisationUnitId=${organisationalUnit.id}&dateReference=${dateReference}${interviewersParamUrl}`;
   };
+
   const call = async () => {
+    setDateReference(dateReference + 1);
     setWaiting(true);
     const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
     if (campaignLabel.length > 10) {
@@ -228,7 +230,6 @@ const Requester = () => {
     newDate = setHours(newDate, hours);
     setDateReference(newDate.getTime());
   };
-
   const checkValidity = () => {
     switch (sessionType) {
       case 'INTERVIEWER':
@@ -274,7 +275,7 @@ const Requester = () => {
             required
             label="Label de la formation (10 caractères maximum)"
             error={campaignLabel === ''}
-            onChange={event => setCampaignLabel(event.target.value)}
+            onChange={event => setCampaignLabel(event.target.value.toUpperCase())}
             value={campaignLabel}
           />
           <Divider className={classes.divider} />
