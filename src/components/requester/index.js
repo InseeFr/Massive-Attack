@@ -97,7 +97,6 @@ const Requester = () => {
   // eslint-disable-next-line no-unused-vars
   const [successMessage, setSuccessMessage] = useState('');
   const [alerts, setAlerts] = useState([]);
-  const [filteredValue, setFilteredValue] = useState('');
 
   const showAlert = (message, severity) => {
     const newAlert = { message, severity };
