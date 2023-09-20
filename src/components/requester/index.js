@@ -97,6 +97,7 @@ const Requester = () => {
   // eslint-disable-next-line no-unused-vars
   const [successMessage, setSuccessMessage] = useState('');
   const [alerts, setAlerts] = useState([]);
+  const [filteredValue, setFilteredValue] = useState('');
 
   const showAlert = (message, severity) => {
     const newAlert = { message, severity };
@@ -274,8 +275,17 @@ const Requester = () => {
             required
             label="Label de la formation (10 caractères maximum)"
             error={campaignLabel === ''}
-            onChange={event => setCampaignLabel(event.target.value.toUpperCase())}
-            value={campaignLabel}
+            onChange={event => {
+              const inputValue = event.target.value;
+              const filteredInput = inputValue
+                .replace(/_/g, '')
+                .replace(/ /g, '')
+                .replace(/\//g, '')
+                .toUpperCase();
+              setFilteredValue(filteredInput);
+              setCampaignLabel(filteredInput);
+            }}
+            value={filteredValue}
           />
           <Divider className={classes.divider} />
           <Select
