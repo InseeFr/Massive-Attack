@@ -87,8 +87,8 @@ const TrainingCourses = () => {
           .map(camp => {
             const { id } = camp;
             const parts = id.split('_');
-            const campaignName = parts?.[4] ?? ''; // Extract campaign name if available
-            return { ...camp, time: getTimestamp(id), type: getType(id), campaignName };
+            const trainingSessionName = parts?.[4] ?? ''; // Extract campaign name if available
+            return { ...camp, time: getTimestamp(id), type: getType(id), trainingSessionName };
           })
           .filter(camp => camp.time === timeStamp && camp.type === type);
         const sessionType = timedCampaigns[0].type;
@@ -116,9 +116,9 @@ const TrainingCourses = () => {
     // Convert timestamp
     const date = new Date(parseInt(timeStamp));
     const dateString = `${date.toLocaleDateString()} ${date.getHours()}h${date.getMinutes()}`;
-    const campaignLabel = campaigns.length > 0 ? campaigns[0].label : '';
-    const campaignName = campaigns.length > 0 ? campaigns[0].campaignName : '';
-    return `Suppression de la formation "${campaignLabel}" avec le label "${campaignName}" prévu le ${dateString}`;
+    const trainingSessionLabel = campaigns.length > 0 ? campaigns[0].label : '';
+    const trainingSessionName = campaigns.length > 0 ? campaigns[0].trainingSessionName : '';
+    return `Suppression de la formation "${trainingSessionLabel}" avec le label "${trainingSessionName}" prévu le ${dateString}`;
   };
 
   const deleteCampaignById = async id => {
@@ -174,8 +174,9 @@ const TrainingCourses = () => {
                   return (
                     <TableRow key={session.timeStamp}>
                       <TableCell align="center">
-                        {session.campaigns.length > 0 && session.campaigns[0].campaignName !== ''
-                          ? session.campaigns[0].campaignName
+                        {session.campaigns.length > 0 &&
+                        session.campaigns[0].trainingSessionName !== ''
+                          ? session.campaigns[0].trainingSessionName
                           : 'Aucun label disponible'}
                       </TableCell>
                       <TableCell align="center">{dateString}</TableCell>
