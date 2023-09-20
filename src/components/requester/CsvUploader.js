@@ -33,7 +33,6 @@ export const handleCSVUpload = async (event, setInterviewers, setInvalidValues, 
         const uniqueValuesArray = Array.from(uniqueValues);
         setInterviewers(uniqueValuesArray.map((value, index) => ({ id: value, index })));
         setInvalidValues(newInvalidValues);
-
         if (newInvalidValues.length > 0) {
           showAlert(
             `The following elements were not considered (expected: 6 uppercase characters): ${newInvalidValues.join(
