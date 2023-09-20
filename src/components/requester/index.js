@@ -365,7 +365,11 @@ const Requester = () => {
             </Alert>
           ))}
           <Divider className={classes.divider} />
-          <Button disabled={waiting || !checkValidity()} variant="contained" onClick={() => call()}>
+          <Button
+            disabled={waiting || !checkValidity() || filteredValue.length === 0}
+            variant="contained"
+            onClick={() => call()}
+          >
             Load Scenario
           </Button>
           {response && <div>{`Result: ${response}`}</div>}
