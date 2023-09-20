@@ -1,13 +1,15 @@
 {
-  "MASSIVE_ATTACK_API_URL": "https://api.organisation-formations.enquetes.developpement.insee.fr/",
+  "MASSIVE_ATTACK_API_URL": "${MASSIVE_ATTACK_API_URL}",
   "_MASSIVE_ATTACK_API_URL_COMMENT_": "url of Massive-Attack API",
 
-  "AUTHENTICATION_MODE": "keycloak",
+  "AUTHENTICATION_MODE": "${AUTHENTICATION_MODE}",
   "_AUTHENTICATION_MODE_COMMENT": "The mode of authentication. ['anonymous','keycloak' ]",
 
-  "PLATEFORM": "DV",
-  "_PLATEFORM_COMMENT": "The API may be connected to multiple environnements. [PRODUCTION, TRAINING]",
+  "PLATEFORM":"${PLATEFORM}",
+  "_PLATEFORM_COMMENT":"The API may be connected to multiple environnements. [PRODUCTION, TRAINING]",
 
-  "ADMIN_ROLE": "administrateurmoog_Capi3G",
-  "USER_ROLES": "gestionnairelocal_Capi3G"
+  "ADMIN_ROLE":"${ADMIN_ROLE}",
+  "USER_ROLES":"${USER_ROLES}"
+
+
 }
