@@ -87,7 +87,7 @@ const TrainingCourses = () => {
           .map(camp => {
             const { id } = camp;
             const parts = id.split('_');
-            const campaignName = parts.length > 4 ? parts[4] : ''; // Extract campaign name if available
+            const campaignName = parts?.[4] ?? ''; // Extract campaign name if available
             return { ...camp, time: getTimestamp(id), type: getType(id), campaignName };
           })
           .filter(camp => camp.time === timeStamp && camp.type === type);
