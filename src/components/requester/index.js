@@ -170,7 +170,6 @@ const Requester = () => {
     const interviewersParamUrl = interviewers.map(inter => `&interviewers=${inter.id}`).join('');
     return `?campaignId=${campaignId.label}&campaignLabel=${campaignLabel}&organisationUnitId=${organisationalUnit.id}&dateReference=${dateReference}${interviewersParamUrl}`;
   };
-
   const call = async () => {
     setDateReference(dateReference + 1);
     setWaiting(true);
