@@ -175,9 +175,6 @@ const Requester = () => {
     setDateReference(dateReference + 1);
     setWaiting(true);
     const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-    if (campaignLabel.length > 10) {
-      setCampaignLabel(campaignLabel.substring(0, 10));
-    }
     const parametrizedUrl =
       MASSIVE_ATTACK_API_URL + '/massive-attack/api/training-course' + constructParamsURL();
     const callResponse = await postTrainingSession(
@@ -281,11 +278,11 @@ const Requester = () => {
                 .replace(/_/g, '')
                 .replace(/ /g, '')
                 .replace(/\//g, '')
-                .toUpperCase();
-              setFilteredValue(filteredInput);
+                .toUpperCase()
+                .substring(0, 10);
               setCampaignLabel(filteredInput);
             }}
-            value={filteredValue}
+            value={campaignLabel}
           />
           <Divider className={classes.divider} />
           <Select
@@ -366,7 +363,7 @@ const Requester = () => {
           ))}
           <Divider className={classes.divider} />
           <Button
-            disabled={waiting || !checkValidity() || filteredValue.length === 0}
+            disabled={waiting || !checkValidity() || campaignLabel.length === 0}
             variant="contained"
             onClick={() => call()}
           >
