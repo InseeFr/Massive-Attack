@@ -171,11 +171,9 @@ const Requester = () => {
     return `?campaignId=${campaignId.label}&campaignLabel=${campaignLabel}&organisationUnitId=${organisationalUnit.id}&dateReference=${dateReference}${interviewersParamUrl}`;
   };
   const call = async () => {
+    setDateReference(dateReference + 1);
     setWaiting(true);
     const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-    if (campaignLabel.length > 10) {
-      setCampaignLabel(campaignLabel.substring(0, 10));
-    }
     const parametrizedUrl =
       MASSIVE_ATTACK_API_URL + '/massive-attack/api/training-course' + constructParamsURL();
     const callResponse = await postTrainingSession(
@@ -228,7 +226,6 @@ const Requester = () => {
     newDate = setHours(newDate, hours);
     setDateReference(newDate.getTime());
   };
-
   const checkValidity = () => {
     switch (sessionType) {
       case 'INTERVIEWER':
@@ -274,7 +271,16 @@ const Requester = () => {
             required
             label="Label de la formation (10 caractères maximum)"
             error={campaignLabel === ''}
-            onChange={event => setCampaignLabel(event.target.value)}
+            onChange={event => {
+              const inputValue = event.target.value;
+              const filteredInput = inputValue
+                .replace(/_/g, '')
+                .replace(/ /g, '')
+                .replace(/\//g, '')
+                .toUpperCase()
+                .substring(0, 10);
+              setCampaignLabel(filteredInput);
+            }}
             value={campaignLabel}
           />
           <Divider className={classes.divider} />
@@ -355,7 +361,11 @@ const Requester = () => {
             </Alert>
           ))}
           <Divider className={classes.divider} />
-          <Button disabled={waiting || !checkValidity()} variant="contained" onClick={() => call()}>
+          <Button
+            disabled={waiting || !checkValidity() || campaignLabel.length === 0}
+            variant="contained"
+            onClick={() => call()}
+          >
             Load Scenario
           </Button>
           {response && <div>{`Result: ${response}`}</div>}

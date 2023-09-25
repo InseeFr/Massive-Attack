@@ -86,7 +86,9 @@ const TrainingCourses = () => {
         const timedCampaigns = camps
           .map(camp => {
             const { id } = camp;
-            return { ...camp, time: getTimestamp(id), type: getType(id) };
+            const parts = id.split('_');
+            const trainingSessionName = parts?.[4] ?? ''; // Extract campaign name if available
+            return { ...camp, time: getTimestamp(id), type: getType(id), trainingSessionName };
           })
           .filter(camp => camp.time === timeStamp && camp.type === type);
         const sessionType = timedCampaigns[0].type;
@@ -105,9 +107,19 @@ const TrainingCourses = () => {
 
       return uniqTimestamps.map(time => buildSession(time));
     };
-
     setSessions(buildSessions(filteredCamps));
   }, [filteredCamps]);
+
+  const generateDeleteMessage = sessionToDelete => {
+    const { timeStamp, campaigns } = sessionToDelete;
+
+    // Convert timestamp
+    const date = new Date(parseInt(timeStamp));
+    const dateString = `${date.toLocaleDateString()} ${date.getHours()}h${date.getMinutes()}`;
+    const trainingSessionLabel = campaigns.length > 0 ? campaigns[0].label : '';
+    const trainingSessionName = campaigns.length > 0 ? campaigns[0].trainingSessionName : '';
+    return `Suppression de la formation "${trainingSessionLabel}" avec le label "${trainingSessionName}" prévu le ${dateString}`;
+  };
 
   const deleteCampaignById = async id => {
     const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
@@ -147,6 +159,7 @@ const TrainingCourses = () => {
             <Table aria-label="training courses table">
               <TableHead>
                 <TableRow>
+                  <TableCell align="center">Label de la formation</TableCell>
                   <TableCell align="center">Date de référence</TableCell>
                   <TableCell align="center">Unité organisationnelle</TableCell>
                   <TableCell align="center">Type de formation</TableCell>
@@ -160,6 +173,12 @@ const TrainingCourses = () => {
                   const dateString = `${date.toLocaleDateString()} ${date.getHours()}h${date.getMinutes()}`;
                   return (
                     <TableRow key={session.timeStamp}>
+                      <TableCell align="center">
+                        {session.campaigns.length > 0 &&
+                        session.campaigns[0].trainingSessionName !== ''
+                          ? session.campaigns[0].trainingSessionName
+                          : 'Aucun label disponible'}
+                      </TableCell>
                       <TableCell align="center">{dateString}</TableCell>
                       <TableCell align="center">{session.organisationUnit}</TableCell>
                       <TableCell align="center">
@@ -179,7 +198,9 @@ const TrainingCourses = () => {
           </TableContainer>
           <Dialog onClose={handleClose} open={openModal}>
             <div className={classes.dialogContent}>
-              <Typography variant="h6">{`Suppression de la session ${sessionToDelete?.type} ${sessionToDelete?.timeStamp}`}</Typography>
+              <Typography variant="h6">
+                {sessionToDelete && generateDeleteMessage(sessionToDelete)}
+              </Typography>
               <div className={classes.row}>
                 <Button variant="outlined" className={classes.cancelButton} onClick={handleClose}>
                   Annuler
