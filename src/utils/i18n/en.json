@@ -13,5 +13,11 @@
   "TypeOfTraining": "Type of training",
   "NumberOfCampaigns": "Number of campaigns",
   "Delete": "Delete",
-  "ListOfTrainingSessions": "List of training sessions"
+  "ListOfTrainingSessions": "List of training sessions",
+  "RemovalOfTraining": "Removal of training",
+  "WithTheLabel": "with the label",
+  "ScheduledOn": "scheduled on",
+  "TrainingSessionSuccess": "Training session creation is a success",
+  "ContactSupport": "An error occured - Please contact support",
+  "NotConsidered": "The following elements were not considered (expected: 6 uppercase characters):"
 }
