@@ -5,6 +5,7 @@ import { AppContext } from '../app/App';
 import { Link } from 'react-router-dom';
 import StarIcon from '@material-ui/icons/Star';
 import { makeStyles } from '@material-ui/core/styles';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
   root: {
@@ -13,6 +14,7 @@ const useStyles = makeStyles({
 });
 
 const Navigation = ({ location }) => {
+  const { t } = useTranslation();
   const classes = useStyles();
   const { isAdmin } = useContext(AppContext);
 
@@ -20,9 +22,9 @@ const Navigation = ({ location }) => {
   return (
     <Paper className={classes.root}>
       <Tabs value={location.pathname}>
-        <Tab label="Accueil" value="/" component={Link} to="/"></Tab>
+        <Tab label={t('Homepage')} value="/" component={Link} to="/"></Tab>
         <Tab
-          label="Sessions de formation"
+          label={t('TrainingSession')}
           value="/training-courses"
           component={Link}
           to="/training-courses"
