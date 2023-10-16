@@ -1,0 +1,17 @@
+{
+  "LoadScenarioButton": "Charger un scénario",
+  "ChoiceTrainingCourse": "Choisissez un scénario de formation",
+  "ReferenceDate": "Date de référence",
+  "FormationLabel": "Label de la formation (10 caractères maximum)",
+  "DivisionLabel": "Pôle",
+  "TraineesList": "Liste des stagiaires",
+  "ImportTraineesList": "Importer une liste de stagiaires par fichier CSV",
+  "HomePage": "Accueil",
+  "TrainingSession": "Sessions de formation",
+  "TrainingLabel": "Training label",
+  "OrganizationalUnit": "Unité organisationnelle",
+  "TypeOfTraining": "Type de formation",
+  "NumberOfCampaigns": "Nombre de campagnes",
+  "Delete": "Supprimer",
+  "ListOfTrainingSessions": "Liste des sessions de formation"
+}

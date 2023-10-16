@@ -1,0 +1,17 @@
+{
+  "LoadScenarioButton": "Load Scenario",
+  "ChoiceTrainingCourse": "Choose a training scenario",
+  "ReferenceDate": "Reference date",
+  "FormationLabel": "Course label (10 characters maximum)",
+  "DivisionLabel": "Division",
+  "TraineesList": "List of trainees",
+  "ImportTraineesList": "Import a list of trainees as a CSV file",
+  "HomePage": "Homepage",
+  "TrainingSession": "Training session",
+  "TrainingLabel": "Training label",
+  "OrganizationalUnit": "Organizational unit",
+  "TypeOfTraining": "Type of training",
+  "NumberOfCampaigns": "Number of campaigns",
+  "Delete": "Delete",
+  "ListOfTrainingSessions": "List of training sessions"
+}
