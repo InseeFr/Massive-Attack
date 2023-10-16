@@ -6,6 +6,7 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core';
+import { useTranslation } from 'react-i18next';
 import Alert from '@material-ui/lab/Alert';
 import React, { useContext, useEffect, useState } from 'react';
 import {
@@ -66,6 +67,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Requester = () => {
+  const { t } = useTranslation();
   const classes = useStyles();
 
   const defaultValue = { id: 'default', ou: { id: 'unknown', label: 'Select...' } };
@@ -148,22 +150,19 @@ const Requester = () => {
   };
 
   const updateInterviewer = (newValue, index) => {
-    const values = interviewers
-      .map(inter => {
-        return inter.index === index
-          ? {
-              ...inter,
-              id: newValue
-                .trim()
-                .substring(0, 6)
-                .toUpperCase(),
-            }
-          : inter;
-      })
-      .map(inter => inter.id);
-    const uniqValues = [...new Set(values)];
-
-    setInterviewers(uniqValues.map((val, index) => ({ id: val, index: index })));
+    const values = interviewers.map(inter => {
+      return inter.index === index
+        ? {
+            ...inter,
+            id: newValue
+              .trim()
+              .substring(0, 6)
+              .toUpperCase(),
+          }
+        : inter;
+    });
+    const uniqueValues = [...new Set(values.map(inter => inter.id))];
+    setInterviewers(uniqueValues.map((val, index) => ({ id: val, index: index })));
   };
 
   const constructParamsURL = () => {
@@ -182,7 +181,7 @@ const Requester = () => {
       PLATEFORM
     ).catch(e => {
       setError(true);
-      showAlert('An error occurred — <strong>Please contact support.', 'error');
+      showAlert(t('ContactSupport'), 'error');
       console.error(error);
       console.error(invalidValues);
       console.log(e);
@@ -191,7 +190,7 @@ const Requester = () => {
     setResponse(await callResponse?.data.campaign);
     // to prevent sending another session with the same timestamp
     console.error(successMessage);
-    showAlert('The training session was a success!', 'success');
+    showAlert(t('TrainingSessionSuccess'), 'success');
     setCampaignId('default');
     setInterviewers([{ id: '', index: 0 }]);
   };
@@ -251,7 +250,7 @@ const Requester = () => {
       {organisationalUnit && (
         <>
           <div className={classes.row}>
-            <Typography className={classes.title}>Pôle</Typography>
+            <Typography className={classes.title}>{t('DivisionLabel')} </Typography>
             <Select
               value={selectedOU}
               required
@@ -269,7 +268,7 @@ const Requester = () => {
           <Divider className={classes.divider} />
           <TextField
             required
-            label="Label de la formation (10 caractères maximum)"
+            label={t('FormationLabel')}
             error={campaignLabel === ''}
             onChange={event => {
               const inputValue = event.target.value;
@@ -294,7 +293,7 @@ const Requester = () => {
             }}
           >
             <MenuItem value={defaultValue.id} selected disabled>
-              Choisissez un scénario de formation
+              {t('ChoiceTrainingCourse')}
             </MenuItem>
             {availableSessions?.map(session => (
               <MenuItem value={session} key={session.label}>
@@ -305,7 +304,7 @@ const Requester = () => {
           <Divider className={classes.divider} />
           <TextField
             id="date"
-            label="Date de référence"
+            label={t('ReferenceDate')}
             type="date"
             InputLabelProps={{
               shrink: true,
@@ -314,11 +313,9 @@ const Requester = () => {
             onChange={event => updateDateReference(event.target.value)}
           />
           <Divider className={classes.divider} />
-          <Typography className={classes.title}>Liste des stagiaires</Typography>
+          <Typography className={classes.title}>{t('TraineesList')}</Typography>
           <div className={classes.csvImport}>
-            <Typography className={classes.title}>
-              Importer une liste de stagiaires par fichier CSV
-            </Typography>
+            <Typography className={classes.title}>{t('ImportTraineesList')}</Typography>
             <input
               type="file"
               accept=".csv"
@@ -366,7 +363,7 @@ const Requester = () => {
             variant="contained"
             onClick={() => call()}
           >
-            Load Scenario
+            {t('LoadScenarioButton')}
           </Button>
           {response && <div>{`Result: ${response}`}</div>}
         </>
