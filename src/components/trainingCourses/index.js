@@ -14,6 +14,7 @@ import {
   makeStyles,
 } from '@material-ui/core';
 import { deleteCampaign, getCampaigns } from '../../utils/api/massive-attack-api';
+import { useTranslation } from 'react-i18next';
 
 import { AppContext } from '../app/App';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -37,6 +38,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const TrainingCourses = () => {
+  const { t } = useTranslation();
   const classes = useStyles();
 
   const { organisationalUnit, isAdmin = false } = useContext(AppContext);
@@ -118,7 +120,9 @@ const TrainingCourses = () => {
     const dateString = `${date.toLocaleDateString()} ${date.getHours()}h${date.getMinutes()}`;
     const trainingSessionLabel = campaigns.length > 0 ? campaigns[0].label : '';
     const trainingSessionName = campaigns.length > 0 ? campaigns[0].trainingSessionName : '';
-    return `Suppression de la formation "${trainingSessionLabel}" avec le label "${trainingSessionName}" prévu le ${dateString}`;
+    return `${t('RemovalOfTraining')} "${trainingSessionLabel}" ${t(
+      'WithTheLabel'
+    )} "${trainingSessionName}" ${t('ScheduledOn')} ${dateString}`;
   };
 
   const deleteCampaignById = async id => {
@@ -154,17 +158,17 @@ const TrainingCourses = () => {
 
       {!waiting && (
         <>
-          <Typography variant="h6">Liste des sessions de formation</Typography>
+          <Typography variant="h6">{t('ListOfTrainingSessions')}</Typography>
           <TableContainer component={Paper}>
             <Table aria-label="training courses table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="center">Label de la formation</TableCell>
-                  <TableCell align="center">Date de référence</TableCell>
-                  <TableCell align="center">Unité organisationnelle</TableCell>
-                  <TableCell align="center">Type de formation</TableCell>
-                  <TableCell align="center">Nombre de campagnes</TableCell>
-                  <TableCell align="center">Supprimer</TableCell>
+                  <TableCell align="center">{t('TrainingLabel')} </TableCell>
+                  <TableCell align="center">{t('ReferenceDate')}</TableCell>
+                  <TableCell align="center">{t('OrganizationalUnit')}</TableCell>
+                  <TableCell align="center">{t('TypeOfTraining')}</TableCell>
+                  <TableCell align="center">{t('NumberOfCampaigns')}</TableCell>
+                  <TableCell align="center">{t('Delete')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
