@@ -5,6 +5,7 @@
   "FormationLabel": "Course label (10 characters maximum)",
   "DivisionLabel": "Division",
   "TraineesList": "List of trainees",
+  "AddATrainee": "Add a trainee",
   "ImportTraineesList": "Import a list of trainees as a CSV file",
   "HomePage": "Homepage",
   "TrainingSession": "Training session",

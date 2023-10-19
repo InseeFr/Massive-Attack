@@ -5,6 +5,7 @@
   "FormationLabel": "Label de la formation (10 caractères maximum)",
   "DivisionLabel": "Pôle",
   "TraineesList": "Liste des stagiaires",
+  "AddATrainee": "Ajouter un stagiaire",
   "ImportTraineesList": "Importer une liste de stagiaires par fichier CSV",
   "HomePage": "Accueil",
   "TrainingSession": "Sessions de formation",

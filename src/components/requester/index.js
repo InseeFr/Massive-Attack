@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
   },
   divider: {
     marginTop: '1em',
-    marginBottom: '1em',
+    marginBottom: '2em',
   },
   invalid: {
     color: 'red',
@@ -56,13 +56,29 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 'bold',
     marginRight: '1em',
   },
+  input: {
+    marginTop: '0.5em',
+  },
+  dividerVertical: {
+    backgroundColor: '#3f51b5',
+    width: '0.05em',
+  },
+  interviewers: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  wrapperTrainees: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
   alertContainer: {
     width: 'fit-content',
     margin: theme.spacing(2, 0, 2, 2),
   },
   csvImport: {
-    margin: theme.spacing(2, 0, 2, 0),
     display: 'flex',
+    flexDirection: 'column',
   },
 }));
 
@@ -313,45 +329,53 @@ const Requester = () => {
             onChange={event => updateDateReference(event.target.value)}
           />
           <Divider className={classes.divider} />
-          <Typography className={classes.title}>{t('TraineesList')}</Typography>
-          <div className={classes.csvImport}>
-            <Typography className={classes.title}>{t('ImportTraineesList')}</Typography>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={event =>
-                handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
-              }
-            />
-          </div>
-          {interviewers.map(inter => (
-            <div className={classes.row} key={inter.index}>
-              <TextField
-                required
-                id="standard-required"
-                variant="outlined"
-                placeholder="IDEP"
-                value={inter.id}
-                onChange={event => updateInterviewer(event.target.value, inter.index)}
-              />
-              <IconButton
-                color="secondary"
-                aria-label="remove interviewer"
-                component="span"
-                onClick={() => removeInterviewer(inter.index)}
-              >
-                <DeleteIcon />
-              </IconButton>
+          <div className={classes.wrapperTrainees}>
+            <Typography className={classes.title}>{t('TraineesList')}</Typography>
+            <div className={classes.interviewers}>
+              {interviewers.map(inter => (
+                <div key={inter.index}>
+                  <TextField
+                    required
+                    id="standard-required"
+                    variant="outlined"
+                    placeholder="IDEP"
+                    value={inter.id}
+                    onChange={event => updateInterviewer(event.target.value, inter.index)}
+                  />
+                  <IconButton
+                    color="secondary"
+                    aria-label="remove interviewer"
+                    component="span"
+                    onClick={() => removeInterviewer(inter.index)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </div>
+              ))}
             </div>
-          ))}
-          <IconButton
-            color="secondary"
-            aria-label="add interviewer"
-            component="span"
-            onClick={() => addInterviewer('')}
-          >
-            <AddCircleIcon />
-          </IconButton>
+            <Divider orientation="vertical" flexItem className={classes.dividerVertical} />
+            <Typography className={classes.title}>{t('AddATrainee')}</Typography>
+            <IconButton
+              color="secondary"
+              aria-label="add interviewer"
+              component="span"
+              onClick={() => addInterviewer('')}
+            >
+              <AddCircleIcon />
+            </IconButton>
+            <Divider orientation="vertical" flexItem className={classes.dividerVertical} />
+            <div className={classes.csvImport}>
+              <Typography className={classes.title}>{t('ImportTraineesList')}</Typography>
+              <input
+                className={classes.input}
+                type="file"
+                accept=".csv"
+                onChange={event =>
+                  handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
+                }
+              />
+            </div>
+          </div>
           {alerts.map((alert, index) => (
             <Alert key={index} className={classes.alertContainer} severity={alert.severity}>
               {alert.message}
