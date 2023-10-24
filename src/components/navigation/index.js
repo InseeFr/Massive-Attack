@@ -21,7 +21,7 @@ const Navigation = ({ location }) => {
   return (
     <Paper className={classes.root}>
       <Tabs value={location.pathname}>
-        <Tab label={t('Homepage')} value="/" component={Link} to="/"></Tab>
+        <Tab label={t('HomePage')} value="/" component={Link} to="/"></Tab>
         <Tab
           label={t('TrainingSession')}
           value="/training-courses"
