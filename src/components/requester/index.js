@@ -5,6 +5,7 @@ import {
   TextField,
   Typography,
   makeStyles,
+  Chip,
 } from '@material-ui/core';
 import { useTranslation } from 'react-i18next';
 import Alert from '@material-ui/lab/Alert';
@@ -25,6 +26,7 @@ import {
   postTrainingSession,
 } from '../../utils/api/massive-attack-api';
 import { handleCSVUpload } from './CsvUploader';
+import './index.css';
 
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { AppContext } from '../app/App';
@@ -47,7 +49,7 @@ const useStyles = makeStyles(theme => ({
   },
   divider: {
     marginTop: '1em',
-    marginBottom: '2em',
+    marginBottom: '1em',
   },
   invalid: {
     color: 'red',
@@ -67,11 +69,6 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
   },
-  wrapperTrainees: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
   alertContainer: {
     width: 'fit-content',
     margin: theme.spacing(2, 0, 2, 2),
@@ -79,6 +76,19 @@ const useStyles = makeStyles(theme => ({
   csvImport: {
     display: 'flex',
     flexDirection: 'column',
+  },
+  wrapper: {
+    display: 'flex',
+    justifyContent: 'space-around',
+  },
+  create: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  chip: {
+    margin: '1em 0 1em 0',
+    width: 'fit-content',
+    alignSelf: 'center',
   },
 }));
 
@@ -329,51 +339,55 @@ const Requester = () => {
             onChange={event => updateDateReference(event.target.value)}
           />
           <Divider className={classes.divider} />
-          <div className={classes.wrapperTrainees}>
-            <Typography className={classes.title}>{t('TraineesList')}</Typography>
-            <div className={classes.interviewers}>
-              {interviewers.map(inter => (
-                <div key={inter.index}>
-                  <TextField
-                    required
-                    id="standard-required"
-                    variant="outlined"
-                    placeholder="IDEP"
-                    value={inter.id}
-                    onChange={event => updateInterviewer(event.target.value, inter.index)}
-                  />
-                  <IconButton
-                    color="secondary"
-                    aria-label="remove interviewer"
-                    component="span"
-                    onClick={() => removeInterviewer(inter.index)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
-              ))}
+          <div className={classes.wrapper}>
+            <div className={classes.create}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                className={classes.button}
+                startIcon={<AddCircleIcon />}
+                onClick={() => addInterviewer('')}
+              >
+                {t('AddATrainee')}
+              </Button>
+              <Chip className={classes.chip} color="dark" label={t('Or')} />
+              <div className={classes.csvImport}>
+                <Typography className={classes.title}>{t('ImportTraineesList')}</Typography>
+                <input
+                  className={classes.input}
+                  type="file"
+                  accept=".csv"
+                  onChange={event =>
+                    handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
+                  }
+                />
+              </div>
             </div>
-            <Divider orientation="vertical" flexItem className={classes.dividerVertical} />
-            <Typography className={classes.title}>{t('AddATrainee')}</Typography>
-            <IconButton
-              color="secondary"
-              aria-label="add interviewer"
-              component="span"
-              onClick={() => addInterviewer('')}
-            >
-              <AddCircleIcon />
-            </IconButton>
-            <Divider orientation="vertical" flexItem className={classes.dividerVertical} />
-            <div className={classes.csvImport}>
-              <Typography className={classes.title}>{t('ImportTraineesList')}</Typography>
-              <input
-                className={classes.input}
-                type="file"
-                accept=".csv"
-                onChange={event =>
-                  handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
-                }
-              />
+            <div className={classes.wrapperTrainees}>
+              <Typography className={classes.title}>{t('TraineesList')}</Typography>
+              <div className={classes.interviewers}>
+                {interviewers.map(inter => (
+                  <div key={inter.index}>
+                    <TextField
+                      required
+                      id="standard-required"
+                      variant="outlined"
+                      placeholder="IDEP"
+                      value={inter.id}
+                      onChange={event => updateInterviewer(event.target.value, inter.index)}
+                    />
+                    <IconButton
+                      color="secondary"
+                      aria-label="remove interviewer"
+                      component="span"
+                      onClick={() => removeInterviewer(inter.index)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           {alerts.map((alert, index) => (
