@@ -54,12 +54,15 @@ const useStyles = makeStyles(theme => ({
   invalid: {
     color: 'red',
   },
+  circleIcon: {
+    fontSize: '1.5em',
+  },
   title: {
     fontWeight: 'bold',
     marginRight: '1em',
   },
   input: {
-    marginTop: '0.5em',
+    display: 'none',
   },
   dividerVertical: {
     backgroundColor: '#3f51b5',
@@ -355,6 +358,7 @@ const Requester = () => {
               <div className={classes.csvImport}>
                 <Typography className={classes.title}>{t('ImportTraineesList')}</Typography>
                 <input
+                  id="file-input"
                   className={classes.input}
                   type="file"
                   accept=".csv"
@@ -362,6 +366,9 @@ const Requester = () => {
                     handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
                   }
                 />
+                <label className="importCsv" id="file-input-label" htmlFor="file-input">
+                  <AddCircleIcon className={classes.circleIcon} /> {t('ImportYourCsv')}
+                </label>
               </div>
             </div>
             <div className={classes.wrapperTrainees}>

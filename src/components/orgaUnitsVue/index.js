@@ -176,10 +176,10 @@ const OrganisationUnitsVue = () => {
               <Typography variant="h6">{`Suppression des ${sessionToDelete?.campaigns?.length} ${sessionToDelete?.type} ${sessionToDelete?.ouid}`}</Typography>
               <div className={classes.buttonContainer}>
                 <Button variant="outlined" className={classes.cancelButton} onClick={handleClose}>
-                  Annuler
+                  {t('Cancel')}
                 </Button>
                 <Button variant="contained" color="primary" onClick={confirmDeletion}>
-                  Valider
+                  {t('Validate')}
                 </Button>
               </div>
             </div>

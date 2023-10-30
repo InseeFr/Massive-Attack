@@ -207,10 +207,10 @@ const TrainingCourses = () => {
               </Typography>
               <div className={classes.row}>
                 <Button variant="outlined" className={classes.cancelButton} onClick={handleClose}>
-                  Annuler
+                  {t('Cancel')}
                 </Button>
                 <Button variant="contained" color="primary" onClick={confirmDeletion}>
-                  Valider
+                  {t('Validate')}
                 </Button>
               </div>
             </div>

@@ -21,5 +21,8 @@
   "ScheduledOn": "prévu le",
   "TrainingSessionSuccess": "La création de la session de formation est un succès",
   "ContactSupport": "Une erreur s'est produite - Veuillez contacter le support",
-  "NotConsidered": "Les éléments suivants n'ont pas été pris en compte (attendus : 6 caractères majuscules) :"
+  "NotConsidered": "Les éléments suivants n'ont pas été pris en compte (attendus : 6 caractères majuscules) :",
+  "ImportYourCsv": "Importer votre fichier CSV",
+  "Cancel": "Annuler",
+  "Validate": "Valider"
 }

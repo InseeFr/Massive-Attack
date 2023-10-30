@@ -21,5 +21,8 @@
   "ScheduledOn": "scheduled on",
   "TrainingSessionSuccess": "Training session creation is a success",
   "ContactSupport": "An error occured - Please contact support",
-  "NotConsidered": "The following elements were not considered (expected: 6 uppercase characters):"
+  "NotConsidered": "The following elements were not considered (expected: 6 uppercase characters):",
+  "ImportYourCsv": "Import your CSV file",
+  "Cancel": "Cancel",
+  "Validate": "Validate"
 }

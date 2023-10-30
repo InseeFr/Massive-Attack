@@ -1,14 +1,18 @@
-input[type='file']::file-selector-button {
-  margin-right: 20px;
+.importCsv {
   border: none;
   background: #3f51b5;
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: 5px;
   color: #fff;
   cursor: pointer;
   transition: background 0.2s ease-in-out;
+  text-transform: uppercase;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  margin-top: 0.6em;
 }
 
-input[type='file']::file-selector-button:hover {
+.importCsv:hover {
   background: #303f9f;
 }
