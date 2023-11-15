@@ -26,8 +26,6 @@ import {
   postTrainingSession,
 } from '../../utils/api/massive-attack-api';
 import { handleCSVUpload } from './CsvUploader';
-import './index.css';
-
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { AppContext } from '../app/App';
 import Button from '@material-ui/core/Button';
@@ -37,6 +35,23 @@ import Select from '@material-ui/core/Select';
 import { getConfiguration } from '../../utils/configuration';
 
 const useStyles = makeStyles(theme => ({
+  importCsv: {
+    border: 'none',
+    background: '#3f51b5',
+    padding: '10px 20px',
+    borderRadius: ' 5px',
+    color: '#fff',
+    cursor: 'pointer',
+    transition: 'background 0.2s ease-in-out',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontFamily: 'Roboto, sans-serif',
+    fontSize: '15px',
+    marginTop: '0.6em',
+    '&:hover': {
+      background: '#303f9f',
+    },
+  },
   column: {
     display: 'flex',
     flexDirection: 'column',
@@ -366,7 +381,7 @@ const Requester = () => {
                     handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
                   }
                 />
-                <label className="importCsv" id="file-input-label" htmlFor="file-input">
+                <label className={classes.importCsv} id="file-input-label" htmlFor="file-input">
                   <AddCircleIcon className={classes.circleIcon} /> {t('ImportYourCsv')}
                 </label>
               </div>
