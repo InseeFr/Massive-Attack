@@ -181,7 +181,7 @@ const TrainingCourses = () => {
                         {session.campaigns.length > 0 &&
                         session.campaigns[0].trainingSessionName !== ''
                           ? session.campaigns[0].trainingSessionName
-                          : 'Aucun label disponible'}
+                          : ''}
                       </TableCell>
                       <TableCell align="center">{dateString}</TableCell>
                       <TableCell align="center">{session.organisationUnit}</TableCell>
