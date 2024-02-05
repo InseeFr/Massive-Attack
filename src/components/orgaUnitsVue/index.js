@@ -19,6 +19,7 @@ import { AppContext } from '../app/App';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Preloader from '../common/Preloader';
 import { getConfiguration } from '../../utils/configuration/index';
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles(theme => ({
   row: {
@@ -42,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const OrganisationUnitsVue = () => {
+  const { t } = useTranslation();
   const classes = useStyles();
 
   const { isAdmin = false } = useContext(AppContext);
@@ -138,15 +140,15 @@ const OrganisationUnitsVue = () => {
 
       {!waiting && (
         <>
-          <Typography variant="h6">Liste des sessions de formation</Typography>
+          <Typography variant="h6">{t('ListOfTrainingSessions')}</Typography>
           <TableContainer component={Paper}>
             <Table aria-label="training courses table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="center">Unité organisationnelle</TableCell>
-                  <TableCell align="center">Type de formation</TableCell>
-                  <TableCell align="center">Nombre de campagnes</TableCell>
-                  <TableCell align="center">Supprimer</TableCell>
+                  <TableCell align="center">{t('OrganizationalUnit')}</TableCell>
+                  <TableCell align="center">{t('TypeOfTraining')}</TableCell>
+                  <TableCell align="center">{t('NumberOfCampaigns')}</TableCell>
+                  <TableCell align="center">{t('Delete')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -174,10 +176,10 @@ const OrganisationUnitsVue = () => {
               <Typography variant="h6">{`Suppression des ${sessionToDelete?.campaigns?.length} ${sessionToDelete?.type} ${sessionToDelete?.ouid}`}</Typography>
               <div className={classes.buttonContainer}>
                 <Button variant="outlined" className={classes.cancelButton} onClick={handleClose}>
-                  Annuler
+                  {t('Cancel')}
                 </Button>
                 <Button variant="contained" color="primary" onClick={confirmDeletion}>
-                  Valider
+                  {t('Validate')}
                 </Button>
               </div>
             </div>

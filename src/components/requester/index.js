@@ -5,7 +5,9 @@ import {
   TextField,
   Typography,
   makeStyles,
+  Chip,
 } from '@material-ui/core';
+import { useTranslation } from 'react-i18next';
 import Alert from '@material-ui/lab/Alert';
 import React, { useContext, useEffect, useState } from 'react';
 import {
@@ -24,7 +26,6 @@ import {
   postTrainingSession,
 } from '../../utils/api/massive-attack-api';
 import { handleCSVUpload } from './CsvUploader';
-
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { AppContext } from '../app/App';
 import Button from '@material-ui/core/Button';
@@ -34,6 +35,23 @@ import Select from '@material-ui/core/Select';
 import { getConfiguration } from '../../utils/configuration';
 
 const useStyles = makeStyles(theme => ({
+  importCsv: {
+    border: 'none',
+    background: '#3f51b5',
+    padding: '10px 20px',
+    borderRadius: ' 5px',
+    color: '#fff',
+    cursor: 'pointer',
+    transition: 'background 0.2s ease-in-out',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontFamily: 'Roboto, sans-serif',
+    fontSize: '15px',
+    marginTop: '0.6em',
+    '&:hover': {
+      background: '#303f9f',
+    },
+  },
   column: {
     display: 'flex',
     flexDirection: 'column',
@@ -51,21 +69,49 @@ const useStyles = makeStyles(theme => ({
   invalid: {
     color: 'red',
   },
+  circleIcon: {
+    fontSize: '1.5em',
+  },
   title: {
     fontWeight: 'bold',
     marginRight: '1em',
+  },
+  input: {
+    display: 'none',
+  },
+  dividerVertical: {
+    backgroundColor: '#3f51b5',
+    width: '0.05em',
+  },
+  interviewers: {
+    display: 'flex',
+    flexDirection: 'column',
   },
   alertContainer: {
     width: 'fit-content',
     margin: theme.spacing(2, 0, 2, 2),
   },
   csvImport: {
-    margin: theme.spacing(2, 0, 2, 0),
     display: 'flex',
+    flexDirection: 'column',
+  },
+  wrapper: {
+    display: 'flex',
+    justifyContent: 'space-around',
+  },
+  create: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  chip: {
+    margin: '1em 0 1em 0',
+    width: 'fit-content',
+    alignSelf: 'center',
   },
 }));
 
 const Requester = () => {
+  const { t } = useTranslation();
   const classes = useStyles();
 
   const defaultValue = { id: 'default', ou: { id: 'unknown', label: 'Select...' } };
@@ -148,22 +194,19 @@ const Requester = () => {
   };
 
   const updateInterviewer = (newValue, index) => {
-    const values = interviewers
-      .map(inter => {
-        return inter.index === index
-          ? {
-              ...inter,
-              id: newValue
-                .trim()
-                .substring(0, 6)
-                .toUpperCase(),
-            }
-          : inter;
-      })
-      .map(inter => inter.id);
-    const uniqValues = [...new Set(values)];
-
-    setInterviewers(uniqValues.map((val, index) => ({ id: val, index: index })));
+    const values = interviewers.map(inter => {
+      return inter.index === index
+        ? {
+            ...inter,
+            id: newValue
+              .trim()
+              .substring(0, 6)
+              .toUpperCase(),
+          }
+        : inter;
+    });
+    const uniqueValues = [...new Set(values.map(inter => inter.id))];
+    setInterviewers(uniqueValues.map((val, index) => ({ id: val, index: index })));
   };
 
   const constructParamsURL = () => {
@@ -182,7 +225,7 @@ const Requester = () => {
       PLATEFORM
     ).catch(e => {
       setError(true);
-      showAlert('An error occurred — <strong>Please contact support.', 'error');
+      showAlert(t('ContactSupport'), 'error');
       console.error(error);
       console.error(invalidValues);
       console.log(e);
@@ -191,7 +234,7 @@ const Requester = () => {
     setResponse(await callResponse?.data.campaign);
     // to prevent sending another session with the same timestamp
     console.error(successMessage);
-    showAlert('The training session was a success!', 'success');
+    showAlert(t('TrainingSessionSuccess'), 'success');
     setCampaignId('default');
     setInterviewers([{ id: '', index: 0 }]);
   };
@@ -251,7 +294,7 @@ const Requester = () => {
       {organisationalUnit && (
         <>
           <div className={classes.row}>
-            <Typography className={classes.title}>Pôle</Typography>
+            <Typography className={classes.title}>{t('DivisionLabel')} </Typography>
             <Select
               value={selectedOU}
               required
@@ -269,7 +312,7 @@ const Requester = () => {
           <Divider className={classes.divider} />
           <TextField
             required
-            label="Label de la formation (10 caractères maximum)"
+            label={t('FormationLabel')}
             error={campaignLabel === ''}
             onChange={event => {
               const inputValue = event.target.value;
@@ -294,7 +337,7 @@ const Requester = () => {
             }}
           >
             <MenuItem value={defaultValue.id} selected disabled>
-              Choisissez un scénario de formation
+              {t('ChoiceTrainingCourse')}
             </MenuItem>
             {availableSessions?.map(session => (
               <MenuItem value={session} key={session.label}>
@@ -305,7 +348,7 @@ const Requester = () => {
           <Divider className={classes.divider} />
           <TextField
             id="date"
-            label="Date de référence"
+            label={t('ReferenceDate')}
             type="date"
             InputLabelProps={{
               shrink: true,
@@ -314,47 +357,61 @@ const Requester = () => {
             onChange={event => updateDateReference(event.target.value)}
           />
           <Divider className={classes.divider} />
-          <Typography className={classes.title}>Liste des stagiaires</Typography>
-          <div className={classes.csvImport}>
-            <Typography className={classes.title}>
-              Importer une liste de stagiaires par fichier CSV
-            </Typography>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={event =>
-                handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
-              }
-            />
-          </div>
-          {interviewers.map(inter => (
-            <div className={classes.row} key={inter.index}>
-              <TextField
-                required
-                id="standard-required"
-                variant="outlined"
-                placeholder="IDEP"
-                value={inter.id}
-                onChange={event => updateInterviewer(event.target.value, inter.index)}
-              />
-              <IconButton
-                color="secondary"
-                aria-label="remove interviewer"
-                component="span"
-                onClick={() => removeInterviewer(inter.index)}
+          <div className={classes.wrapper}>
+            <div className={classes.create}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                className={classes.button}
+                startIcon={<AddCircleIcon />}
+                onClick={() => addInterviewer('')}
               >
-                <DeleteIcon />
-              </IconButton>
+                {t('AddATrainee')}
+              </Button>
+              <Chip className={classes.chip} color="dark" label={t('Or')} />
+              <div className={classes.csvImport}>
+                <Typography className={classes.title}>{t('ImportTraineesList')}</Typography>
+                <input
+                  id="file-input"
+                  className={classes.input}
+                  type="file"
+                  accept=".csv"
+                  onChange={event =>
+                    handleCSVUpload(event, setInterviewers, setInvalidValues, showAlert)
+                  }
+                />
+                <label className={classes.importCsv} id="file-input-label" htmlFor="file-input">
+                  <AddCircleIcon className={classes.circleIcon} /> {t('ImportYourCsv')}
+                </label>
+              </div>
             </div>
-          ))}
-          <IconButton
-            color="secondary"
-            aria-label="add interviewer"
-            component="span"
-            onClick={() => addInterviewer('')}
-          >
-            <AddCircleIcon />
-          </IconButton>
+            <div className={classes.wrapperTrainees}>
+              <Typography className={classes.title}>{t('TraineesList')}</Typography>
+              <div className={classes.interviewers}>
+                {interviewers.map(inter => (
+                  <div key={inter.index}>
+                    <TextField
+                      required
+                      id="standard-required"
+                      variant="outlined"
+                      placeholder="IDEP"
+                      value={inter.id}
+                      onChange={event => updateInterviewer(event.target.value, inter.index)}
+                    />
+                    <IconButton
+                      color="secondary"
+                      aria-label="remove interviewer"
+                      component="span"
+                      onClick={() => removeInterviewer(inter.index)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
           {alerts.map((alert, index) => (
             <Alert key={index} className={classes.alertContainer} severity={alert.severity}>
               {alert.message}
@@ -366,7 +423,7 @@ const Requester = () => {
             variant="contained"
             onClick={() => call()}
           >
-            Load Scenario
+            {t('LoadScenarioButton')}
           </Button>
           {response && <div>{`Result: ${response}`}</div>}
         </>
