@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 14
+      - name: Use Node.js 18
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 18
       - run: yarn
-      - run: yarn build
+      - run: yarn --openssl-legacy-provider build
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
