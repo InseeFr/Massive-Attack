@@ -7,6 +7,7 @@ import {
   LOC_STOR_AUTH_MODE_KEY,
   LOC_STOR_PLATFORM_KEY,
   LOC_STOR_ADMIN_ROLE,
+  LOC_STOR_USER_ROLE,
 } from 'utils/constants';
 import { initializeOidc } from './utils/authentication/useAuth';
 
@@ -21,6 +22,7 @@ async function main() {
   window.localStorage.setItem(LOC_STOR_API_URL_KEY, configuration.MASSIVE_ATTACK_API_URL);
   window.localStorage.setItem(LOC_STOR_PLATFORM_KEY, configuration.PLATEFORM);
   window.localStorage.setItem(LOC_STOR_ADMIN_ROLE, configuration.ADMIN_ROLE);
+  window.localStorage.setItem(LOC_STOR_USER_ROLE, configuration.USER_ROLES);
 
   // Initialize OIDC globally to use it later
   const { OidcProvider } = initializeOidc({
