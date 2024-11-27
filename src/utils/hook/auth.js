@@ -24,10 +24,8 @@ export const useAuth = () => {
     setPending(false);
   };
 
-  const anyMatch = (checkedRoles, targetRoles) => {
-    console.log({ checkedRoles, targetRoles });
-    return checkedRoles.filter(r => targetRoles.includes(r)).length > 0;
-  };
+  const anyMatch = (checkedRoles, targetRoles) =>
+    checkedRoles.filter(r => targetRoles.includes(r)).length > 0;
 
   useEffect(() => {
     const authenticationMode = window.localStorage.getItem(LOC_STOR_AUTH_MODE_KEY);
