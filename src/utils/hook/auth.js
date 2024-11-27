@@ -24,13 +24,16 @@ export const useAuth = () => {
     setPending(false);
   };
 
-  const anyMatch = (checkedRoles, targetRoles) =>
-    checkedRoles.filter(r => targetRoles.includes(r)).length > 0;
+  const anyMatch = (checkedRoles, targetRoles) => {
+    console.log({ checkedRoles, targetRoles });
+    return checkedRoles.filter(r => targetRoles.includes(r)).length > 0;
+  };
 
   useEffect(() => {
     const authenticationMode = window.localStorage.getItem(LOC_STOR_AUTH_MODE_KEY);
     const adminRole = window.localStorage.getItem(LOC_STOR_ADMIN_ROLE);
     const userRole = window.localStorage.getItem(LOC_STOR_USER_ROLE);
+    console.log(userRole);
     switch (authenticationMode) {
       case 'anonymous':
         window.localStorage.setItem(LOC_STOR_USER_KEY, JSON.stringify(GUEST_USER));
@@ -47,6 +50,7 @@ export const useAuth = () => {
             id: userToken.preferred_username,
             roles: userToken.groups,
           };
+          console.log(userToken);
 
           if (anyMatch(userInfo.roles, [...userRole, adminRole])) {
             accessAuthorized();
