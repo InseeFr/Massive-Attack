@@ -20,7 +20,7 @@
     "react-dom": "^17.0.2",
     "react-i18next": "^13.2.2",
     "react-router-dom": "^5.2.1",
-    "react-scripts": "4.0.3",
+    "react-scripts": "5.0.1",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
@@ -91,7 +91,6 @@
   "devDependencies": {
     "@types/react": "^16.9.23",
     "@types/react-router-dom": "^5.1.3",
-    "@babel/plugin-transform-private-property-in-object": "^7.25.9",
     "copy-and-watch": "^0.1.4",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
