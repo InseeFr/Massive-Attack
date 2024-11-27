@@ -14,7 +14,9 @@ const resources = {
   },
 };
 
-i18n
+const i18nInstance = i18n;
+
+i18nInstance
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -28,4 +30,4 @@ i18n
     },
   });
 
-export default i18n;
+export default i18nInstance;
