@@ -42,6 +42,7 @@ export const useAuth = () => {
         break;
 
       case 'oidc':
+        console.log({ isAuthenticated, tokens });
         if (isAuthenticated) {
           const userToken = tokens.decodedIdToken;
           const userInfo = {
@@ -51,6 +52,7 @@ export const useAuth = () => {
             roles: userToken.groups,
           };
           console.log(userToken);
+          console.log(userInfo);
 
           if (anyMatch(userInfo.roles, [...userRole, adminRole])) {
             accessAuthorized();
