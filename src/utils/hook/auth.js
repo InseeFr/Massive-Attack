@@ -41,7 +41,6 @@ export const useAuth = () => {
         break;
 
       case 'oidc':
-        console.log({ isAuthenticated, tokens });
         if (isAuthenticated) {
           const userToken = tokens.decodedIdToken;
           const userInfo = {
@@ -50,12 +49,10 @@ export const useAuth = () => {
             id: userToken.preferred_username,
             roles: userToken.roles,
           };
-          console.log(userToken);
-          console.log(userInfo);
 
           if (anyMatch(userInfo.roles, [...userRole, adminRole])) {
             accessAuthorized();
-            setIsAdmin(anyMatch(tokens.decodedIdToken.groups, [adminRole]));
+            setIsAdmin(anyMatch(userInfo.roles, [adminRole]));
             window.localStorage.setItem(LOC_STOR_USER_KEY, JSON.stringify(userInfo));
           } else {
             accessDenied();
