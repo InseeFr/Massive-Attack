@@ -32,7 +32,7 @@ export const useAuth = () => {
   useEffect(() => {
     const authenticationMode = window.localStorage.getItem(LOC_STOR_AUTH_MODE_KEY);
     const adminRole = window.localStorage.getItem(LOC_STOR_ADMIN_ROLE);
-    const userRole = window.localStorage.getItem(LOC_STOR_USER_ROLE);
+    const userRole = window.localStorage.getItem(LOC_STOR_USER_ROLE)?.split(',') ?? [];
     console.log(userRole);
     switch (authenticationMode) {
       case 'anonymous':
