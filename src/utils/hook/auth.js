@@ -12,7 +12,7 @@ export const useAuth = () => {
   const { tokens, isAuthenticated } = useIsAuthenticated();
   const [authenticated, setAuthenticated] = useState(false);
   const [pending, setPending] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const accessAuthorized = () => {
     setAuthenticated(true);
