@@ -48,7 +48,7 @@ export const useAuth = () => {
             roles: userToken.groups,
           };
 
-          if (anyMatch(userInfo.roles, [userRole, adminRole])) {
+          if (anyMatch(userInfo.roles, [...userRole, adminRole])) {
             accessAuthorized();
             setIsAdmin(anyMatch(tokens.decodedIdToken.groups, [adminRole]));
             window.localStorage.setItem(LOC_STOR_USER_KEY, JSON.stringify(userInfo));
