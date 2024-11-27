@@ -4,6 +4,7 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core';
 import { version } from '../../../package.json';
+import { LOC_STOR_PLATFORM_KEY } from 'utils/constants';
 
 const useStyles = makeStyles(() => ({
   row: {
@@ -23,9 +24,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Header = ({ user = { firstName: 'John', lastName: 'Doe' }, pf }) => {
+const Header = ({ user = { firstName: 'John', lastName: 'Doe' } }) => {
   const classes = useStyles();
   const { firstName, lastName } = user;
+  const pf = window.localStorage.getItem(LOC_STOR_PLATFORM_KEY);
   return (
     <AppBar className={classes.row} position="static">
       <div className={classes.textBlock}>

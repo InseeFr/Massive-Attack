@@ -5,21 +5,19 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '../../utils/i18n/i18n';
 import Header from '../header';
 import Navigation from '../navigation';
-import OrganisationUnitsVue from '../orgaUnitsVue';
 import Preloader from '../common/Preloader';
 import Requester from '../requester';
 import TrainingCourses from '../trainingCourses';
-import { getConfiguration } from '../../utils/configuration';
 import { getUserOrganisationalUnit } from '../../utils/api/massive-attack-api';
-import { getUser } from '../../utils/userInfo';
 import { useAuth } from '../../utils/hook/auth';
+import { LOC_STOR_API_URL_KEY, LOC_STOR_USER_KEY } from 'utils/constants';
+import { OrganisationUnitsVue } from 'components/orgaUnitsVue';
 
 export const AppContext = React.createContext();
 
 const App = () => {
-  const { authenticated, isAdmin, pending } = useAuth();
+  const { authenticated, isAdmin, pending, tokens } = useAuth();
   const [organisationalUnit, setOrganisationalUnit] = useState();
-  const [pf, setPf] = useState('');
   const [dateReference, setDateReference] = useState(new Date().getTime());
   const [campaignLabel, setCampaignLabel] = useState('');
   const [campaignId, setCampaignId] = useState('');
@@ -28,20 +26,19 @@ const App = () => {
   const [error, setError] = useState(undefined);
   const [organisationalUnits, setOrganisationalUnits] = useState([]);
   const [availableSessions, setAvailableSessions] = useState(undefined);
+  const [user, setUser] = useState({ firstName: 'John', lastName: 'Doe' });
 
   useEffect(() => {
     const fetchUserOrgaUnit = async () => {
-      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-      const orgaUnitResponse = await getUserOrganisationalUnit(
-        MASSIVE_ATTACK_API_URL,
-        AUTHENTICATION_MODE,
-        PLATEFORM
-      );
+      const apiUrl = window.localStorage.getItem(LOC_STOR_API_URL_KEY);
+      const orgaUnitResponse = await getUserOrganisationalUnit(apiUrl, tokens);
       setOrganisationalUnit(await orgaUnitResponse.data);
-      setPf(PLATEFORM);
     };
-    if (authenticated) fetchUserOrgaUnit();
-  }, [authenticated]);
+    if (authenticated) {
+      fetchUserOrgaUnit();
+      setUser(JSON.parse(window.localStorage.getItem(LOC_STOR_USER_KEY)));
+    }
+  }, [authenticated, tokens]);
 
   const context = {
     organisationalUnit,
@@ -75,7 +72,7 @@ const App = () => {
       )}
       {authenticated && (
         <>
-          <Header user={getUser()} pf={pf} />
+          <Header user={user} />
           <BrowserRouter>
             <I18nextProvider i18n={i18n}>
               <AppContext.Provider value={context}>

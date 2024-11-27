@@ -18,8 +18,9 @@ import { deleteCampaign, getCampaigns } from '../../utils/api/massive-attack-api
 import { AppContext } from '../app/App';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Preloader from '../common/Preloader';
-import { getConfiguration } from '../../utils/configuration/index';
 import { useTranslation } from 'react-i18next';
+import { useIsAuthenticated } from 'utils/authentication/useAuth';
+import { LOC_STOR_API_URL_KEY } from 'utils/constants';
 
 const useStyles = makeStyles(theme => ({
   row: {
@@ -42,9 +43,10 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const OrganisationUnitsVue = () => {
+export const OrganisationUnitsVue = () => {
   const { t } = useTranslation();
   const classes = useStyles();
+  const { tokens } = useIsAuthenticated();
 
   const { isAdmin = false } = useContext(AppContext);
   const [campaigns, setCampaigns] = useState([]);
@@ -53,6 +55,7 @@ const OrganisationUnitsVue = () => {
   const [sessionToDelete, setSessionToDelete] = useState();
   const [filteredCamps, setFilteredCamps] = useState([]);
   const [waiting, setWaiting] = useState(false);
+  const MASSIVE_ATTACK_API_URL = window.localStorage.getItem(LOC_STOR_API_URL_KEY);
 
   useEffect(() => {
     setFilteredCamps(campaigns.filter(({ id }) => id.includes('_')));
@@ -60,17 +63,11 @@ const OrganisationUnitsVue = () => {
 
   useEffect(() => {
     const fetchCampaigns = async () => {
-      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-      const camps = await getCampaigns(
-        MASSIVE_ATTACK_API_URL,
-        AUTHENTICATION_MODE,
-        PLATEFORM,
-        isAdmin
-      );
+      const camps = await getCampaigns(MASSIVE_ATTACK_API_URL, tokens, isAdmin);
       setCampaigns(await camps.data);
     };
     fetchCampaigns();
-  }, [isAdmin]);
+  }, [MASSIVE_ATTACK_API_URL, isAdmin, tokens]);
 
   useEffect(() => {
     const getOrganisationalUnit = id => id.split('_')[2];
@@ -108,8 +105,7 @@ const OrganisationUnitsVue = () => {
   }, [filteredCamps]);
 
   const deleteCampaignById = async id => {
-    const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-    return deleteCampaign(MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM)(id);
+    return deleteCampaign(MASSIVE_ATTACK_API_URL, tokens)(id);
   };
 
   const deleteCampaignsBySession = session => {
@@ -189,5 +185,3 @@ const OrganisationUnitsVue = () => {
     </>
   );
 };
-
-export default OrganisationUnitsVue;

@@ -19,7 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { AppContext } from '../app/App';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Preloader from '../common/Preloader';
-import { getConfiguration } from '../../utils/configuration/index';
+import { useIsAuthenticated } from 'utils/authentication/useAuth';
+import { LOC_STOR_API_URL_KEY } from 'utils/constants';
 
 const useStyles = makeStyles(theme => ({
   row: {
@@ -40,6 +41,7 @@ const useStyles = makeStyles(theme => ({
 const TrainingCourses = () => {
   const { t } = useTranslation();
   const classes = useStyles();
+  const { tokens } = useIsAuthenticated();
 
   const { organisationalUnit, isAdmin = false } = useContext(AppContext);
   const [campaigns, setCampaigns] = useState([]);
@@ -48,6 +50,7 @@ const TrainingCourses = () => {
   const [sessionToDelete, setSessionToDelete] = useState();
   const [filteredCamps, setFilteredCamps] = useState([]);
   const [waiting, setWaiting] = useState(false);
+  const MASSIVE_ATTACK_API_URL = window.localStorage.getItem(LOC_STOR_API_URL_KEY);
 
   useEffect(() => {
     const isVisibleCampaign = camp => {
@@ -65,17 +68,16 @@ const TrainingCourses = () => {
 
   useEffect(() => {
     const fetchCampaigns = async () => {
-      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
       const camps = await getCampaigns(
         MASSIVE_ATTACK_API_URL,
-        AUTHENTICATION_MODE,
-        PLATEFORM,
+        tokens,
+
         isAdmin
       );
       setCampaigns(await camps.data);
     };
     fetchCampaigns();
-  }, [isAdmin]);
+  }, [isAdmin, tokens, MASSIVE_ATTACK_API_URL]);
 
   useEffect(() => {
     const getTimestamp = id => id.split('_')[3];
@@ -125,9 +127,8 @@ const TrainingCourses = () => {
     )} "${trainingSessionName}" ${t('ScheduledOn')} ${dateString}`;
   };
 
-  const deleteCampaignById = async id => {
-    const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
-    return deleteCampaign(MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM)(id);
+  const deleteCampaignById = id => {
+    return deleteCampaign(MASSIVE_ATTACK_API_URL, tokens)(id);
   };
 
   const deleteCampaignsBySession = session => {
