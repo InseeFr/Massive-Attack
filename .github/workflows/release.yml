@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 18
       - run: yarn
-      - run: yarn --openssl-legacy-provider build
+      - run: yarn build
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
