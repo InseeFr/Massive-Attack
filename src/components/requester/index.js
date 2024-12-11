@@ -32,7 +32,8 @@ import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Preloader from '../common/Preloader';
 import Select from '@material-ui/core/Select';
-import { getConfiguration } from '../../utils/configuration';
+import { useIsAuthenticated } from 'utils/authentication/useAuth';
+import { LOC_STOR_API_URL_KEY } from 'utils/constants';
 
 const useStyles = makeStyles(theme => ({
   importCsv: {
@@ -113,6 +114,7 @@ const useStyles = makeStyles(theme => ({
 const Requester = () => {
   const { t } = useTranslation();
   const classes = useStyles();
+  const { tokens } = useIsAuthenticated();
 
   const defaultValue = { id: 'default', ou: { id: 'unknown', label: 'Select...' } };
   const {
@@ -130,7 +132,6 @@ const Requester = () => {
     setInterviewers,
     sessionType,
     setSessionType,
-    error,
     setError,
     organisationalUnits,
     setOrganisationalUnits,
@@ -141,8 +142,8 @@ const Requester = () => {
   const [waiting, setWaiting] = useState(false);
   const [invalidValues, setInvalidValues] = useState([]);
   // eslint-disable-next-line no-unused-vars
-  const [successMessage, setSuccessMessage] = useState('');
   const [alerts, setAlerts] = useState([]);
+  const MASSIVE_ATTACK_API_URL = window.localStorage.getItem(LOC_STOR_API_URL_KEY);
 
   const showAlert = (message, severity) => {
     const newAlert = { message, severity };
@@ -161,20 +162,15 @@ const Requester = () => {
 
   useEffect(() => {
     const getSessions = async () => {
-      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
       let tempError;
-      const sessions = await getTrainingSessions(
-        MASSIVE_ATTACK_API_URL,
-        AUTHENTICATION_MODE,
-        PLATEFORM
-      ).catch(() => {
+      const sessions = await getTrainingSessions(MASSIVE_ATTACK_API_URL, tokens).catch(() => {
         tempError = true;
         setError(true);
       });
       setAvailableSessions(tempError ? undefined : await sessions.data);
     };
     getSessions();
-  }, [setError, setAvailableSessions]);
+  }, [setError, setAvailableSessions, tokens, MASSIVE_ATTACK_API_URL]);
 
   useEffect(() => {
     if (!organisationalUnit) {
@@ -216,24 +212,17 @@ const Requester = () => {
   const call = async () => {
     setDateReference(dateReference + 1);
     setWaiting(true);
-    const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
     const parametrizedUrl =
       MASSIVE_ATTACK_API_URL + '/massive-attack/api/training-course' + constructParamsURL();
-    const callResponse = await postTrainingSession(
-      parametrizedUrl,
-      AUTHENTICATION_MODE,
-      PLATEFORM
-    ).catch(e => {
+    const callResponse = await postTrainingSession(parametrizedUrl, tokens).catch(e => {
       setError(true);
       showAlert(t('ContactSupport'), 'error');
-      console.error(error);
       console.error(invalidValues);
       console.log(e);
     });
     setWaiting(false);
     setResponse(await callResponse?.data.campaign);
     // to prevent sending another session with the same timestamp
-    console.error(successMessage);
     showAlert(t('TrainingSessionSuccess'), 'success');
     setCampaignId('default');
     setInterviewers([{ id: '', index: 0 }]);
@@ -241,20 +230,15 @@ const Requester = () => {
 
   useEffect(() => {
     const getOUs = async () => {
-      const { MASSIVE_ATTACK_API_URL, AUTHENTICATION_MODE, PLATEFORM } = await getConfiguration();
       let tempError;
-      const ous = await getOrganisationUnits(
-        MASSIVE_ATTACK_API_URL,
-        AUTHENTICATION_MODE,
-        PLATEFORM
-      ).catch(() => {
+      const ous = await getOrganisationUnits(MASSIVE_ATTACK_API_URL, tokens).catch(() => {
         tempError = true;
         setError(true);
       });
       setOrganisationalUnits(tempError ? undefined : await ous.data);
     };
     getOUs();
-  }, [setError, setOrganisationalUnits]);
+  }, [setError, setOrganisationalUnits, tokens, MASSIVE_ATTACK_API_URL]);
 
   const updateDateReference = stringDate => {
     let newDate = new Date(stringDate);

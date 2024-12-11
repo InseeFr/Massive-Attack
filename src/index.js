@@ -2,9 +2,43 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/app/App';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+import {
+  LOC_STOR_API_URL_KEY,
+  LOC_STOR_AUTH_MODE_KEY,
+  LOC_STOR_PLATFORM_KEY,
+  LOC_STOR_ADMIN_ROLE,
+  LOC_STOR_USER_ROLE,
+} from 'utils/constants';
+import { initializeOidc } from './utils/authentication/useAuth';
+
+async function main() {
+  // Load OIDC configuration
+  const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
+  const response = await fetch(`${publicUrl.origin}/configuration.json`);
+  const configuration = await response.json();
+
+  // store configuration locally
+  window.localStorage.setItem(LOC_STOR_AUTH_MODE_KEY, configuration.AUTHENTICATION_MODE);
+  window.localStorage.setItem(LOC_STOR_API_URL_KEY, configuration.MASSIVE_ATTACK_API_URL);
+  window.localStorage.setItem(LOC_STOR_PLATFORM_KEY, configuration.PLATEFORM);
+  window.localStorage.setItem(LOC_STOR_ADMIN_ROLE, configuration.ADMIN_ROLE);
+  window.localStorage.setItem(LOC_STOR_USER_ROLE, configuration.USER_ROLES);
+
+  // Initialize OIDC globally to use it later
+  const { OidcProvider } = initializeOidc({
+    issuerUri: configuration.ISSUER_URI,
+    clientId: configuration.OIDC_CLIENT_ID,
+    publicUrl: '/',
+  });
+
+  ReactDOM.render(
+    <React.StrictMode>
+      <OidcProvider>
+        <App />
+      </OidcProvider>
+    </React.StrictMode>,
+    document.getElementById('root')
+  );
+}
+
+main();

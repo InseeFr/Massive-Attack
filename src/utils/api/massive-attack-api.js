@@ -1,110 +1,75 @@
-import { authentication, getHeader } from './utils';
+import { getHeader } from './utils';
 
 import Axios from 'axios';
 
-export const getTrainingSessions = async (urlSabianeData, authenticationMode, pf) =>
+export const getTrainingSessions = async (urlSabianeData, tokens) => {
+  try {
+    const response = await Axios.get(
+      `${urlSabianeData}/massive-attack/api/training-course-scenario`,
+      {
+        headers: getHeader(tokens),
+      }
+    );
+    return response; // Resolves the promise with the response
+  } catch (error) {
+    // Checks if there is an error response and extracts a meaningful message
+    const errorMessage = error.response?.data?.error?.message || error.message || 'Unknown error';
+    throw new Error(`Failed to fetch training sessions: ${errorMessage}`);
+  }
+};
+
+export const postTrainingSession = async (urlSabianeData, tokens) =>
   new Promise((resolve, reject) => {
-    authentication(authenticationMode)
-      .then(() => {
-        Axios.get(`${urlSabianeData}/massive-attack/api/training-course-scenario`, {
-          headers: getHeader(authenticationMode),
-          params: { plateform: pf },
-        })
-          .then(res => resolve(res))
-          .catch(e => {
-            reject(new Error(`Failed to fetch training sessions : ${e}`));
-          });
-      })
+    Axios.post(
+      urlSabianeData,
+      {},
+      {
+        headers: getHeader(tokens),
+      }
+    )
+      .then(res => resolve(res))
+      .catch(e => reject(new Error(`Failed to post training session : ${e.message}`)));
+  });
+
+export const getUserOrganisationalUnit = async (urlSabianeData, token) =>
+  new Promise((resolve, reject) => {
+    Axios.get(`${urlSabianeData}/massive-attack/api/user/organisationUnit`, {
+      headers: getHeader(token),
+    })
+      .then(res => resolve(res))
       .catch(e => {
-        reject(new Error(`Error during refreshToken : ${e.response.data.error.message}`));
+        reject(new Error(`Failed to fetch user organisationUnit : ${e.toJSON()}`));
       });
   });
 
-export const postTrainingSession = async (urlSabianeData, authenticationMode, pf) =>
+export const getCampaigns = async (urlSabianeData, token, admin = false) =>
   new Promise((resolve, reject) => {
-    authentication(authenticationMode)
-      .then(() => {
-        Axios.post(
-          urlSabianeData,
-          {},
-          {
-            headers: getHeader(authenticationMode),
-            params: { plateform: pf },
-          }
-        )
-          .then(res => resolve(res))
-          .catch(e => reject(new Error(`Failed to post training session : ${e.message}`)));
-      })
-      .catch(e => reject(new Error(`Error during refreshToken : ${e.message}`)));
-  });
-
-export const getUserOrganisationalUnit = async (urlSabianeData, authenticationMode, pf) =>
-  new Promise((resolve, reject) => {
-    authentication(authenticationMode)
-      .then(() => {
-        Axios.get(`${urlSabianeData}/massive-attack/api/user/organisationUnit`, {
-          headers: getHeader(authenticationMode),
-          params: { plateform: pf },
-        })
-          .then(res => resolve(res))
-          .catch(e => {
-            reject(new Error(`Failed to fetch user organisationUnit : ${e.toJSON()}`));
-          });
-      })
+    Axios.get(`${urlSabianeData}/massive-attack/api/training-courses`, {
+      headers: getHeader(token),
+      params: { admin },
+    })
+      .then(res => resolve(res))
       .catch(e => {
-        console.log(e.toJSON());
-        reject(new Error(`Error during refreshToken : ${e.response.data.error.message}`));
+        reject(new Error(`Failed to fetch training courses : ${e}`));
       });
   });
 
-export const getCampaigns = async (urlSabianeData, authenticationMode, pf, admin = false) =>
+export const deleteCampaign = (urlSabianeData, token) => async id =>
   new Promise((resolve, reject) => {
-    authentication(authenticationMode)
-      .then(() => {
-        Axios.get(`${urlSabianeData}/massive-attack/api/training-courses`, {
-          headers: getHeader(authenticationMode),
-          params: { plateform: pf, admin },
-        })
-          .then(res => resolve(res))
-          .catch(e => {
-            reject(new Error(`Failed to fetch training courses : ${e}`));
-          });
-      })
-      .catch(e => {
-        reject(new Error(`Error during refreshToken : ${e.response.data.error.message}`));
-      });
+    Axios.delete(`${urlSabianeData}/massive-attack/api/campaign/${id}`, {
+      headers: getHeader(token),
+    })
+      .then(res => resolve(res))
+      .catch(e => reject(new Error(`Failed to delete campaign : ${e}`)));
   });
 
-export const deleteCampaign = (urlSabianeData, authenticationMode, pf) => async id =>
+export const getOrganisationUnits = async (urlSabianeData, token) =>
   new Promise((resolve, reject) => {
-    authentication(authenticationMode)
-      .then(() => {
-        Axios.delete(`${urlSabianeData}/massive-attack/api/campaign/${id}`, {
-          headers: getHeader(authenticationMode),
-          params: { plateform: pf },
-        })
-          .then(res => resolve(res))
-          .catch(e => reject(new Error(`Failed to delete campaign : ${e}`)));
-      })
+    Axios.get(`${urlSabianeData}/massive-attack/api/organisation-units`, {
+      headers: getHeader(token),
+    })
+      .then(res => resolve(res))
       .catch(e => {
-        reject(new Error(`Error during refreshToken : ${e.response.data.error.message}`));
-      });
-  });
-
-export const getOrganisationUnits = async (urlSabianeData, authenticationMode, pf) =>
-  new Promise((resolve, reject) => {
-    authentication(authenticationMode)
-      .then(() => {
-        Axios.get(`${urlSabianeData}/massive-attack/api/organisation-units`, {
-          headers: getHeader(authenticationMode),
-          params: { plateform: pf },
-        })
-          .then(res => resolve(res))
-          .catch(e => {
-            reject(new Error(`Failed to fetch organisation units : ${e}`));
-          });
-      })
-      .catch(e => {
-        reject(new Error(`Error during refreshToken : ${e.response.data.error.message}`));
+        reject(new Error(`Failed to fetch organisation units : ${e}`));
       });
   });

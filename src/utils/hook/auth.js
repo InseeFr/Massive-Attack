@@ -1,8 +1,15 @@
-import { GUEST_USER, LOCALE_STORAGE_USER_KEY } from './../constants';
-import { getTokenInfo, keycloakAuthentication } from './../keycloak';
+import { useIsAuthenticated } from 'utils/authentication/useAuth';
 import { useEffect, useState } from 'react';
+import {
+  LOC_STOR_USER_KEY,
+  GUEST_USER,
+  LOC_STOR_AUTH_MODE_KEY,
+  LOC_STOR_ADMIN_ROLE,
+  LOC_STOR_USER_ROLE,
+} from 'utils/constants';
 
 export const useAuth = () => {
+  const { tokens, isAuthenticated } = useIsAuthenticated();
   const [authenticated, setAuthenticated] = useState(false);
   const [pending, setPending] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -21,49 +28,39 @@ export const useAuth = () => {
     checkedRoles.filter(r => targetRoles.includes(r)).length > 0;
 
   useEffect(() => {
-    const configURL = `${window.location.origin}/configuration.json`;
-    if (pending) {
-      fetch(configURL)
-        .then(response => response.json())
-        .then(data => {
-          switch (data.AUTHENTICATION_MODE) {
-            case 'anonymous':
-              window.localStorage.setItem(LOCALE_STORAGE_USER_KEY, JSON.stringify(GUEST_USER));
-              accessAuthorized();
-              setIsAdmin(true);
-              break;
+    const authenticationMode = window.localStorage.getItem(LOC_STOR_AUTH_MODE_KEY);
+    const adminRole = window.localStorage.getItem(LOC_STOR_ADMIN_ROLE);
+    const userRole = window.localStorage.getItem(LOC_STOR_USER_ROLE)?.split(',') ?? [];
+    switch (authenticationMode) {
+      case 'anonymous':
+        window.localStorage.setItem(LOC_STOR_USER_KEY, JSON.stringify(GUEST_USER));
+        accessAuthorized();
+        setIsAdmin(true);
+        break;
 
-            case 'keycloak':
-              if (!authenticated) {
-                keycloakAuthentication({
-                  onLoad: 'login-required',
-                  checkLoginIframe: false,
-                })
-                  .then(auth => {
-                    if (auth) {
-                      const userInfos = getTokenInfo();
-                      const { roles } = userInfos;
-                      if (anyMatch(roles, [...data.USER_ROLES, data.ADMIN_ROLE])) {
-                        window.localStorage.setItem(
-                          LOCALE_STORAGE_USER_KEY,
-                          JSON.stringify(userInfos)
-                        );
-                        accessAuthorized();
-                        setIsAdmin(anyMatch(roles, [data.ADMIN_ROLE]));
-                      } else {
-                        accessDenied();
-                      }
-                    } else {
-                      accessDenied();
-                    }
-                  })
-                  .catch(() => accessDenied());
-              }
-              break;
-            default:
+      case 'oidc':
+        if (isAuthenticated) {
+          const userToken = tokens.decodedIdToken;
+          const userInfo = {
+            firstName: userToken.given_name,
+            lastName: userToken.family_name,
+            id: userToken.preferred_username,
+            roles: userToken.roles,
+          };
+
+          if (anyMatch(userInfo.roles, [...userRole, adminRole])) {
+            accessAuthorized();
+            setIsAdmin(anyMatch(userInfo.roles, [adminRole]));
+            window.localStorage.setItem(LOC_STOR_USER_KEY, JSON.stringify(userInfo));
+          } else {
+            accessDenied();
           }
-        });
+        } else {
+          accessDenied();
+        }
+        break;
+      default:
     }
-  });
-  return { authenticated, isAdmin, pending };
+  }, [isAuthenticated, tokens]);
+  return { authenticated, isAdmin, pending, tokens };
 };

@@ -5,11 +5,12 @@
   "AUTHENTICATION_MODE": "${AUTHENTICATION_MODE}",
   "_AUTHENTICATION_MODE_COMMENT": "The mode of authentication. ['anonymous','keycloak' ]",
 
-  "PLATEFORM":"${PLATEFORM}",
-  "_PLATEFORM_COMMENT":"The API may be connected to multiple environnements. [PRODUCTION, TRAINING]",
+  "ISSUER_URI": "${ISSUER_URI}",
+  "OIDC_CLIENT_ID": "${OIDC_CLIENT_ID}",
 
-  "ADMIN_ROLE":"${ADMIN_ROLE}",
-  "USER_ROLES":"${USER_ROLES}"
+  "PLATEFORM": "${PLATEFORM}",
+  "_PLATEFORM_COMMENT": "Just a label in the header",
 
-
+  "ADMIN_ROLE": "${ADMIN_ROLE}",
+  "USER_ROLES": "${USER_ROLES}"
 }
