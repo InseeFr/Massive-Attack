@@ -40,13 +40,16 @@ export const useAuth = () => {
 
       case 'oidc':
         if (isAuthenticated) {
+          console.log(tokens);
           const userToken = tokens.decodedIdToken;
+          console.log(userToken);
           const userInfo = {
             firstName: userToken.given_name,
             lastName: userToken.family_name,
             id: userToken.preferred_username,
             roles: userToken.roles,
           };
+          console.log(userInfo);
 
           if (anyMatch(userInfo.roles, [...userRole, adminRole])) {
             accessAuthorized();
