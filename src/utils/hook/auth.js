@@ -45,7 +45,7 @@ export const useAuth = () => {
             firstName: userToken.given_name,
             lastName: userToken.family_name,
             id: userToken.preferred_username,
-            roles: userToken.roles,
+            roles: userToken.realm_access.roles,
           };
 
           if (anyMatch(userInfo.roles, [...userRole, adminRole])) {
