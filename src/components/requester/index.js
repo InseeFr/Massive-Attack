@@ -301,9 +301,9 @@ const Requester = () => {
             onChange={event => {
               const inputValue = event.target.value;
               const filteredInput = inputValue
-                .replace(/_/g, '')
-                .replace(/ /g, '')
-                .replace(/\//g, '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // remove accents
+                .replace(/[_ /'"`;:!?<>§*()[\]{}#&.]/g, '') // remove special characters
                 .toUpperCase()
                 .substring(0, 10);
               setCampaignLabel(filteredInput);
