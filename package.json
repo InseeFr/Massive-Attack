@@ -103,6 +103,6 @@
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "jest-sonar-reporter": "^2.0.0",
-    "prettier": "^1.19.1"
+    "prettier": "^3.0.0"
   }
 }
